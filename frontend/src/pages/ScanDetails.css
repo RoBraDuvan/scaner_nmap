@@ -11,6 +11,12 @@
   margin-bottom: 8px;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .scan-meta {
   margin-bottom: 30px;
 }

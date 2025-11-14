@@ -59,6 +59,24 @@ function ScanDetails() {
     }
   };
 
+  const replicateScan = async () => {
+    if (!scan) return;
+
+    try {
+      const response = await api.post('/scans/', {
+        name: `${scan.name} (Copy)`,
+        target: scan.target,
+        scan_type: scan.scan_type
+      });
+
+      // Redirect to the new scan details
+      navigate(`/scan/${response.data.id}`);
+    } catch (error) {
+      console.error('Error replicating scan:', error);
+      alert('Failed to replicate scan');
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading scan details...</div>;
   }
@@ -74,9 +92,14 @@ function ScanDetails() {
           <h1>{scan.name}</h1>
           <span className={`badge badge-${scan.status}`}>{scan.status}</span>
         </div>
-        <button className="btn btn-secondary" onClick={() => navigate('/')}>
-          Back to Dashboard
-        </button>
+        <div className="header-actions">
+          <button className="btn btn-primary" onClick={replicateScan} title="Run a new scan with the same parameters">
+            🔄 Replicate Scan
+          </button>
+          <button className="btn btn-secondary" onClick={() => navigate('/')}>
+            Back to Dashboard
+          </button>
+        </div>
       </div>
 
       <div className="scan-meta card">
