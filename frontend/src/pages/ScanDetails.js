@@ -151,14 +151,32 @@ function ScanDetails() {
               {results.map(result => (
                 <div key={result.id} className="result-card card">
                   <div className="result-header">
-                    <h3>{result.host}</h3>
+                    <h3>
+                      {result.host}
+                      {result.hostname && <span className="hostname-badge"> ({result.hostname})</span>}
+                    </h3>
                     <span className={`state-badge ${result.state}`}>
                       {result.state}
                     </span>
                   </div>
 
-                  {result.hostname && (
-                    <p className="hostname">Hostname: {result.hostname}</p>
+                  {result.mac_vendor && (
+                    <p className="device-info mac-vendor">
+                      <strong>Manufacturer:</strong> {result.mac_vendor}
+                      {result.mac_address && <span className="mac-address"> ({result.mac_address})</span>}
+                    </p>
+                  )}
+
+                  {result.os_detection && result.os_detection.matches && result.os_detection.matches.length > 0 && (
+                    <p className="device-info">
+                      <strong>Device:</strong> {result.os_detection.matches[0].name}
+                    </p>
+                  )}
+
+                  {!result.hostname && !result.mac_vendor && result.services && result.services.length > 0 && (
+                    <p className="device-info">
+                      <strong>Services:</strong> {result.services.slice(0, 3).join(', ')}
+                    </p>
                   )}
 
                   {result.ports && result.ports.length > 0 && (

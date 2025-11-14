@@ -57,6 +57,8 @@ class ScanResultResponse(BaseModel):
     ports: Optional[list]
     os_detection: Optional[dict]
     services: Optional[list]
+    mac_address: Optional[str]
+    mac_vendor: Optional[str]
     created_at: datetime
 
     class Config:

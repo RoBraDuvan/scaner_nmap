@@ -43,6 +43,8 @@ class ScanResult(Base):
     services = Column(JSONB, nullable=True)
     vulnerabilities = Column(JSONB, nullable=True)
     raw_output = Column(Text, nullable=True)
+    mac_address = Column(String(17), nullable=True)
+    mac_vendor = Column(Text, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
 
     # Relationships
