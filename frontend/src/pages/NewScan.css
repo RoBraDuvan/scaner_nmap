@@ -1,0 +1,88 @@
+.new-scan h1 {
+  font-size: 32px;
+  color: #1f2937;
+  margin-bottom: 30px;
+}
+
+.scan-form {
+  margin-bottom: 40px;
+}
+
+.scan-form small {
+  display: block;
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.template-info {
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.template-info h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.template-info p {
+  margin: 8px 0;
+  color: #4b5563;
+}
+
+.template-info code {
+  background: #e5e7eb;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.scan-types-info h2 {
+  font-size: 24px;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+
+.scan-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.scan-type-card {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.scan-type-card h3 {
+  margin: 0 0 8px 0;
+  color: #374151;
+  font-size: 16px;
+}
+
+.scan-type-card p {
+  margin: 0 0 12px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.scan-type-card code {
+  background: #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  display: block;
+}

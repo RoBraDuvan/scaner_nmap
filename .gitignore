@@ -1,0 +1,73 @@
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# FastAPI
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Node / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+build/
+dist/
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Docker
+*.pid
+*.seed
+*.pid.lock
+postgres_data/
+volumes/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Scan results
+scan_results/
+*.xml
+*.nmap
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Others
+.claude/**

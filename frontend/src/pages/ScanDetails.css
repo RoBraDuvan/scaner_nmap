@@ -1,0 +1,249 @@
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.details-header h1 {
+  font-size: 32px;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.scan-meta {
+  margin-bottom: 30px;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.meta-value {
+  font-size: 16px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 30px;
+}
+
+.tab {
+  padding: 12px 24px;
+  border: none;
+  background: none;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  color: #667eea;
+}
+
+.tab.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.results-header h2 {
+  font-size: 24px;
+  color: #1f2937;
+}
+
+.download-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.result-card {
+  border-left: 4px solid #667eea;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.result-header h3 {
+  font-size: 20px;
+  color: #1f2937;
+  margin: 0;
+}
+
+.state-badge {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.state-badge.up {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.state-badge.down {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.hostname {
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.ports-section,
+.os-section {
+  margin-top: 20px;
+}
+
+.ports-section h4,
+.os-section h4 {
+  font-size: 16px;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.ports-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ports-table th {
+  background: #f9fafb;
+  padding: 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.ports-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.port-state {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.os-list {
+  list-style: none;
+  padding: 0;
+}
+
+.os-list li {
+  padding: 8px 12px;
+  background: #f9fafb;
+  margin-bottom: 6px;
+  border-radius: 6px;
+}
+
+.accuracy {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.logs-section h2 {
+  font-size: 24px;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.log-entry {
+  display: grid;
+  grid-template-columns: 80px 80px 1fr;
+  gap: 12px;
+  padding: 8px 12px;
+  border-left: 3px solid transparent;
+}
+
+.log-time {
+  color: #6b7280;
+}
+
+.log-level {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.log-message {
+  color: #374151;
+}
+
+.log-info {
+  border-left-color: #3b82f6;
+}
+
+.log-info .log-level {
+  color: #3b82f6;
+}
+
+.log-success {
+  border-left-color: #10b981;
+}
+
+.log-success .log-level {
+  color: #10b981;
+}
+
+.log-error {
+  border-left-color: #ef4444;
+}
+
+.log-error .log-level {
+  color: #ef4444;
+}

@@ -1,0 +1,87 @@
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: nmap_scanner_db
+    environment:
+      POSTGRES_DB: nmap_scanner
+      POSTGRES_USER: scanner_user
+      POSTGRES_PASSWORD: scanner_pass_2024
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - scanner_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scanner_user -d nmap_scanner"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: nmap_scanner_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - scanner_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nmap_scanner_backend
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://scanner_user:scanner_pass_2024@database:5432/nmap_scanner}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      SECRET_KEY: ${SECRET_KEY:-supersecretkey}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    volumes:
+      - ./backend:/app
+      - scan_results:/app/scan_results
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scanner_network
+    # Privileged mode needed for Nmap raw packet operations
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+  # Frontend Web UI
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nmap_scanner_frontend
+    environment:
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8000}
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - scanner_network
+
+networks:
+  scanner_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  scan_results:
