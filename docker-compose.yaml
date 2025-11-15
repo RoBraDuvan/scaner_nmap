@@ -34,7 +34,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API
+  # Backend API (Python)
   backend:
     build:
       context: ./backend
@@ -63,6 +63,35 @@ services:
       - NET_ADMIN
       - NET_RAW
 
+  # Backend API (Go) - High Performance
+  backend-go:
+    build:
+      context: ./backend-go
+      dockerfile: Dockerfile
+    container_name: nmap_scanner_backend_go
+    environment:
+      PORT: "8001"
+      DATABASE_URL: ${DATABASE_URL:-postgresql://scanner_user:scanner_pass_2024@database:5432/nmap_scanner}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      USE_SYSTEM_NMAP: ${USE_SYSTEM_NMAP:-false}
+      NMAP_PATH: ${NMAP_PATH:-/usr/bin/nmap}
+      SECRET_KEY: ${SECRET_KEY:-supersecretkey}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8001:8001"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scanner_network
+    # Privileged mode needed for Nmap raw packet operations
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
   # Frontend Web UI
   frontend:
     build:
@@ -70,11 +99,12 @@ services:
       dockerfile: Dockerfile
     container_name: nmap_scanner_frontend
     environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8000}
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8001}
     ports:
       - "3000:80"
     depends_on:
       - backend
+      - backend-go
     networks:
       - scanner_network
 

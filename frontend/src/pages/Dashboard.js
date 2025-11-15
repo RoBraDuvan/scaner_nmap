@@ -152,7 +152,7 @@ function Dashboard() {
                     Cancel
                   </button>
                 )}
-                {(scan.status === 'completed' || scan.status === 'failed') && (
+                {(scan.status === 'completed' || scan.status === 'failed' || scan.status === 'cancelled') && (
                   <button
                     className="btn btn-danger"
                     onClick={() => deleteScan(scan.id)}
