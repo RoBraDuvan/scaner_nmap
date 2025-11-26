@@ -80,51 +80,26 @@ function NetworkScans() {
         </Link>
       </div>
 
-      <div className="filters-container">
+      <div className="filters">
         <div className="filter-group">
-          <span className="filter-group-label">Status:</span>
-          <div className="filter-buttons">
-            {['all', 'pending', 'running', 'completed', 'failed', 'cancelled'].map(status => (
-              <button
-                key={status}
-                className={`filter-btn ${filter === status ? 'active' : ''}`}
-                data-status={status}
-                onClick={() => setFilter(status)}
-              >
-                {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
-          </div>
+          <label>Scanner:</label>
+          <select value={filterScanner} onChange={(e) => setFilterScanner(e.target.value)}>
+            <option value="all">All Scanners</option>
+            <option value="nmap">Nmap</option>
+            <option value="masscan">Masscan</option>
+            <option value="dns">DNS</option>
+          </select>
         </div>
-        <div className="filter-separator" />
         <div className="filter-group">
-          <span className="filter-group-label">Scanner:</span>
-          <div className="filter-buttons">
-            <button
-              className={`filter-btn ${filterScanner === 'all' ? 'active' : ''}`}
-              onClick={() => setFilterScanner('all')}
-            >
-              All
-            </button>
-            <button
-              className={`filter-btn ${filterScanner === 'nmap' ? 'active' : ''}`}
-              onClick={() => setFilterScanner('nmap')}
-            >
-              🔍 nmap
-            </button>
-            <button
-              className={`filter-btn ${filterScanner === 'masscan' ? 'active' : ''}`}
-              onClick={() => setFilterScanner('masscan')}
-            >
-              ⚡ masscan
-            </button>
-            <button
-              className={`filter-btn ${filterScanner === 'dns' ? 'active' : ''}`}
-              onClick={() => setFilterScanner('dns')}
-            >
-              🌐 dns
-            </button>
-          </div>
+          <label>Status:</label>
+          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="running">Running</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
         </div>
       </div>
 

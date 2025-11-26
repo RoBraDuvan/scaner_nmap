@@ -103,21 +103,17 @@ function Vulnerabilities() {
         </Link>
       </div>
 
-      <div className="filters-container">
+      <div className="filters">
         <div className="filter-group">
-          <span className="filter-group-label">Status:</span>
-          <div className="filter-buttons">
-            {['all', 'pending', 'running', 'completed', 'failed', 'cancelled'].map(status => (
-              <button
-                key={status}
-                className={`filter-btn ${filter === status ? 'active' : ''}`}
-                data-status={status}
-                onClick={() => setFilter(status)}
-              >
-                {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
-          </div>
+          <label>Status:</label>
+          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="running">Running</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
         </div>
       </div>
 

@@ -346,3 +346,224 @@ CREATE INDEX idx_web_scan_logs_scan_id ON web_scan_logs(scan_id);
 COMMENT ON TABLE web_scans IS 'Stores web scanning jobs (ffuf, gowitness, testssl.sh)';
 COMMENT ON TABLE web_scan_results IS 'Stores results from web scanning tools';
 COMMENT ON TABLE web_scan_logs IS 'Stores execution logs for web scans';
+
+-- =====================================================
+-- RECON SCANNING TABLES (Subdomain, WHOIS, DNS, Tech)
+-- =====================================================
+
+-- Recon scans table
+CREATE TABLE IF NOT EXISTS recon_scans (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    target TEXT NOT NULL,
+    scan_type VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    progress INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    error_message TEXT,
+    configuration JSONB,
+    CONSTRAINT valid_recon_scan_status CHECK (status IN ('pending', 'running', 'completed', 'failed', 'cancelled')),
+    CONSTRAINT valid_recon_scan_type CHECK (scan_type IN ('subdomain', 'whois', 'dns', 'tech'))
+);
+
+-- Subdomain results table
+CREATE TABLE IF NOT EXISTS subdomain_results (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES recon_scans(id) ON DELETE CASCADE,
+    subdomain VARCHAR(500) NOT NULL,
+    source VARCHAR(100),
+    ip_addresses TEXT[],
+    is_alive BOOLEAN DEFAULT false,
+    http_status INTEGER,
+    https_status INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_id, subdomain)
+);
+
+-- WHOIS results table
+CREATE TABLE IF NOT EXISTS whois_results (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES recon_scans(id) ON DELETE CASCADE,
+    domain VARCHAR(255) NOT NULL,
+    registrar TEXT,
+    registrar_url TEXT,
+    creation_date TIMESTAMP,
+    expiration_date TIMESTAMP,
+    updated_date TIMESTAMP,
+    name_servers TEXT[],
+    status TEXT[],
+    registrant JSONB,
+    admin_contact JSONB,
+    tech_contact JSONB,
+    raw_data TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_id, domain)
+);
+
+-- DNS results table
+CREATE TABLE IF NOT EXISTS dns_results (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES recon_scans(id) ON DELETE CASCADE,
+    domain VARCHAR(255) NOT NULL,
+    a_records TEXT[],
+    aaaa_records TEXT[],
+    cname_records TEXT[],
+    mx_records JSONB,
+    ns_records TEXT[],
+    txt_records TEXT[],
+    soa_record JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_id, domain)
+);
+
+-- Tech detection results table
+CREATE TABLE IF NOT EXISTS tech_results (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES recon_scans(id) ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    status_code INTEGER,
+    title TEXT,
+    server TEXT,
+    content_type TEXT,
+    technologies JSONB,
+    headers JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_id, url)
+);
+
+-- Recon scan logs table
+CREATE TABLE IF NOT EXISTS recon_scan_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES recon_scans(id) ON DELETE CASCADE,
+    level VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for recon tables
+CREATE INDEX idx_recon_scans_status ON recon_scans(status);
+CREATE INDEX idx_recon_scans_type ON recon_scans(scan_type);
+CREATE INDEX idx_recon_scans_created_at ON recon_scans(created_at DESC);
+CREATE INDEX idx_subdomain_results_scan_id ON subdomain_results(scan_id);
+CREATE INDEX idx_whois_results_scan_id ON whois_results(scan_id);
+CREATE INDEX idx_dns_results_scan_id ON dns_results(scan_id);
+CREATE INDEX idx_tech_results_scan_id ON tech_results(scan_id);
+CREATE INDEX idx_recon_scan_logs_scan_id ON recon_scan_logs(scan_id);
+
+-- Comments for recon tables
+COMMENT ON TABLE recon_scans IS 'Stores recon scanning jobs (subdomain, whois, dns, tech)';
+COMMENT ON TABLE subdomain_results IS 'Stores subdomain enumeration results';
+COMMENT ON TABLE whois_results IS 'Stores WHOIS lookup results';
+COMMENT ON TABLE dns_results IS 'Stores DNS record query results';
+COMMENT ON TABLE tech_results IS 'Stores technology detection results';
+COMMENT ON TABLE recon_scan_logs IS 'Stores execution logs for recon scans';
+
+-- =====================================================
+-- API DISCOVERY TABLES (Kiterunner, Arjun, GraphQL, Swagger)
+-- =====================================================
+
+-- API scans table
+CREATE TABLE IF NOT EXISTS api_scans (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    target TEXT NOT NULL,
+    scan_type VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    progress INTEGER DEFAULT 0,
+    config JSONB,
+    error TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    CONSTRAINT valid_api_scan_status CHECK (status IN ('pending', 'running', 'completed', 'failed', 'cancelled')),
+    CONSTRAINT valid_api_scan_type CHECK (scan_type IN ('kiterunner', 'arjun', 'graphql', 'swagger', 'full'))
+);
+
+-- API endpoints table
+CREATE TABLE IF NOT EXISTS api_endpoints (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES api_scans(id) ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    method VARCHAR(20) NOT NULL,
+    status_code INTEGER,
+    content_type TEXT,
+    length INTEGER DEFAULT 0,
+    source VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_id, url, method)
+);
+
+-- API parameters table
+CREATE TABLE IF NOT EXISTS api_parameters (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES api_scans(id) ON DELETE CASCADE,
+    endpoint_id UUID REFERENCES api_endpoints(id) ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    param_type VARCHAR(50) NOT NULL,
+    method VARCHAR(20) NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_id, url, name, param_type)
+);
+
+-- GraphQL schemas table
+CREATE TABLE IF NOT EXISTS graphql_schemas (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES api_scans(id) ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    introspection_enabled BOOLEAN DEFAULT false,
+    types JSONB,
+    queries JSONB,
+    mutations JSONB,
+    subscriptions JSONB,
+    raw_schema TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_id, url)
+);
+
+-- Swagger/OpenAPI specs table
+CREATE TABLE IF NOT EXISTS swagger_specs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES api_scans(id) ON DELETE CASCADE,
+    url TEXT NOT NULL,
+    version VARCHAR(50),
+    title TEXT,
+    description TEXT,
+    base_path TEXT,
+    paths JSONB,
+    raw_spec TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_id, url)
+);
+
+-- API scan logs table
+CREATE TABLE IF NOT EXISTS api_scan_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES api_scans(id) ON DELETE CASCADE,
+    level VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for API discovery tables
+CREATE INDEX idx_api_scans_status ON api_scans(status);
+CREATE INDEX idx_api_scans_type ON api_scans(scan_type);
+CREATE INDEX idx_api_scans_created_at ON api_scans(created_at DESC);
+CREATE INDEX idx_api_endpoints_scan_id ON api_endpoints(scan_id);
+CREATE INDEX idx_api_endpoints_method ON api_endpoints(method);
+CREATE INDEX idx_api_parameters_scan_id ON api_parameters(scan_id);
+CREATE INDEX idx_api_parameters_type ON api_parameters(param_type);
+CREATE INDEX idx_graphql_schemas_scan_id ON graphql_schemas(scan_id);
+CREATE INDEX idx_swagger_specs_scan_id ON swagger_specs(scan_id);
+CREATE INDEX idx_api_scan_logs_scan_id ON api_scan_logs(scan_id);
+
+-- Comments for API discovery tables
+COMMENT ON TABLE api_scans IS 'Stores API discovery scan jobs (Kiterunner, Arjun, GraphQL, Swagger)';
+COMMENT ON TABLE api_endpoints IS 'Stores discovered API endpoints';
+COMMENT ON TABLE api_parameters IS 'Stores discovered API parameters';
+COMMENT ON TABLE graphql_schemas IS 'Stores GraphQL introspection results';
+COMMENT ON TABLE swagger_specs IS 'Stores discovered OpenAPI/Swagger specifications';
+COMMENT ON TABLE api_scan_logs IS 'Stores execution logs for API scans';

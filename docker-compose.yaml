@@ -44,12 +44,18 @@ services:
       PORT: "8000"
       NETWORK_SERVICE_URL: http://network-service:8001
       WEB_SERVICE_URL: http://web-service:8002
+      RECON_SERVICE_URL: http://recon-service:8003
+      API_SERVICE_URL: http://api-service:8004
+      CMS_SERVICE_URL: http://cms-service:8005
       ENVIRONMENT: ${ENVIRONMENT:-development}
     ports:
       - "8000:8000"
     depends_on:
       - network-service
       - web-service
+      - recon-service
+      - api-service
+      - cms-service
     networks:
       - scanner_network
 
@@ -98,6 +104,82 @@ services:
       - nuclei_templates:/root/nuclei-templates
     ports:
       - "8002:8002"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scanner_network
+
+  # Recon Service - Subdomain enumeration, WHOIS, DNS, Tech detection
+  recon-service:
+    build:
+      context: ./services/recon
+      dockerfile: Dockerfile
+    container_name: scanner_recon_service
+    environment:
+      PORT: "8003"
+      DATABASE_URL: ${DATABASE_URL:-postgresql://scanner_user:scanner_pass_2024@database:5432/nmap_scanner?sslmode=disable}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      SUBFINDER_PATH: /usr/local/bin/subfinder
+      AMASS_PATH: /usr/local/bin/amass
+      HTTPX_PATH: /usr/local/bin/httpx
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8003:8003"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scanner_network
+
+  # API Discovery Service - Kiterunner, Arjun, GraphQL, Swagger
+  api-service:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    container_name: scanner_api_service
+    environment:
+      PORT: "8004"
+      DATABASE_URL: ${DATABASE_URL:-postgresql://scanner_user:scanner_pass_2024@database:5432/nmap_scanner?sslmode=disable}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      KITERUNNER_PATH: /usr/local/bin/kr
+      ARJUN_PATH: /usr/local/bin/arjun
+      FFUF_PATH: /usr/local/bin/ffuf
+      WORDLISTS_PATH: /usr/share/wordlists
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8004:8004"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scanner_network
+
+  # CMS Detection Service - WhatWeb, CMSeeK, WPScan
+  cms-service:
+    build:
+      context: ./services/cms
+      dockerfile: Dockerfile
+    container_name: scanner_cms_service
+    environment:
+      PORT: "8005"
+      DB_HOST: database
+      DB_PORT: "5432"
+      DB_USER: scanner_user
+      DB_PASSWORD: scanner_pass_2024
+      DB_NAME: nmap_scanner
+      WHATWEB_PATH: /usr/local/bin/whatweb
+      CMSEEK_PATH: /opt/cmseek/cmseek.py
+      WPSCAN_PATH: /usr/local/bin/wpscan
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8005:8005"
     depends_on:
       database:
         condition: service_healthy

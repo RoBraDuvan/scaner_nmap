@@ -19,6 +19,8 @@ func main() {
 	log.Printf("Network Service: %s", cfg.NetworkServiceURL)
 	log.Printf("Web Service: %s", cfg.WebServiceURL)
 	log.Printf("Recon Service: %s", cfg.ReconServiceURL)
+	log.Printf("API Service: %s", cfg.APIServiceURL)
+	log.Printf("CMS Service: %s", cfg.CMSServiceURL)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -64,18 +66,6 @@ func main() {
 	web.All("/templates/*", serviceProxy.ProxyTo(cfg.WebServiceURL+"/api", "/api/web"))
 
 	// ============================================
-	// Recon Service Routes (Port 8003)
-	// Handles: Subdomain enum, OSINT, email harvesting
-	// ============================================
-	recon := api.Group("/recon")
-	recon.All("/subdomains", serviceProxy.ProxyTo(cfg.ReconServiceURL+"/api", "/api/recon"))
-	recon.All("/subdomains/*", serviceProxy.ProxyTo(cfg.ReconServiceURL+"/api", "/api/recon"))
-	recon.All("/osint", serviceProxy.ProxyTo(cfg.ReconServiceURL+"/api", "/api/recon"))
-	recon.All("/osint/*", serviceProxy.ProxyTo(cfg.ReconServiceURL+"/api", "/api/recon"))
-	recon.All("/emails", serviceProxy.ProxyTo(cfg.ReconServiceURL+"/api", "/api/recon"))
-	recon.All("/emails/*", serviceProxy.ProxyTo(cfg.ReconServiceURL+"/api", "/api/recon"))
-
-	// ============================================
 	// Legacy routes (backward compatibility)
 	// These map old routes directly to services
 	// No prefix stripping - forward path as-is
@@ -98,6 +88,18 @@ func main() {
 	// /api/webscans -> Web Service /api/webscans (ffuf, gowitness, testssl)
 	api.All("/webscans", serviceProxy.ProxyTo(cfg.WebServiceURL, ""))
 	api.All("/webscans/*", serviceProxy.ProxyTo(cfg.WebServiceURL, ""))
+
+	// /api/recon -> Recon Service /api/recon (subdomains, whois, dns, tech)
+	api.All("/recon", serviceProxy.ProxyTo(cfg.ReconServiceURL, ""))
+	api.All("/recon/*", serviceProxy.ProxyTo(cfg.ReconServiceURL, ""))
+
+	// /api/apiscans -> API Service /api/apiscans (kiterunner, arjun, graphql, swagger)
+	api.All("/apiscans", serviceProxy.ProxyTo(cfg.APIServiceURL, ""))
+	api.All("/apiscans/*", serviceProxy.ProxyTo(cfg.APIServiceURL, ""))
+
+	// /api/cmsscans -> CMS Service /api/cmsscans (whatweb, cmseek, wpscan)
+	api.All("/cmsscans", serviceProxy.ProxyTo(cfg.CMSServiceURL, ""))
+	api.All("/cmsscans/*", serviceProxy.ProxyTo(cfg.CMSServiceURL, ""))
 
 	// /api/vulnerability-templates -> Network Service (still has the templates)
 	api.All("/vulnerability-templates", serviceProxy.ProxyTo(cfg.NetworkServiceURL, ""))
@@ -122,6 +124,8 @@ func main() {
 				"network": cfg.NetworkServiceURL,
 				"web":     cfg.WebServiceURL,
 				"recon":   cfg.ReconServiceURL,
+				"api":     cfg.APIServiceURL,
+				"cms":     cfg.CMSServiceURL,
 			},
 		})
 	})

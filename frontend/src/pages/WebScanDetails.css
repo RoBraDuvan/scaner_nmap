@@ -1,50 +1,70 @@
 .webscan-details {
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 20px;
 }
 
-.details-header {
+.page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  flex: 1;
 }
 
-.btn-back {
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 16px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
 }
 
-.header-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+.back-link:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  color: #1f2937;
 }
 
-.header-title h1 {
-  margin: 0;
+.page-header h1 {
+  margin: 0 0 12px 0;
   font-size: 28px;
   color: #1f2937;
 }
 
-.header-actions {
+.scan-meta {
   display: flex;
-  gap: 8px;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-/* Tool badges */
-.tool-badge {
+.target {
+  color: #6b7280;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Type badges */
+.type-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
+  gap: 4px;
+  padding: 4px 10px;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
@@ -65,6 +85,76 @@
   background: #d1fae5;
   color: #065f46;
 }
+
+/* Progress section */
+.progress-section {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.progress-bar-large {
+  position: relative;
+  height: 30px;
+  background: #e5e7eb;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-bar-large .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+.progress-bar-large .progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  color: #374151;
+}
+
+.progress-status {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Severity colors for stat cards */
+.stat-card.severity-critical .stat-value { color: #dc2626; }
+.stat-card.severity-high .stat-value { color: #ea580c; }
+.stat-card.severity-medium .stat-value { color: #d97706; }
+.stat-card.severity-low .stat-value { color: #0284c7; }
+.stat-card.severity-info .stat-value { color: #6b7280; }
 
 /* Status badges */
 .status-badge {
@@ -194,31 +284,29 @@
 /* Tabs */
 .tabs {
   display: flex;
-  gap: 4px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #e5e7eb;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .tab {
-  padding: 12px 24px;
-  background: none;
+  padding: 10px 20px;
   border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  color: #374151;
   transition: all 0.2s ease;
 }
 
 .tab:hover {
-  color: #374151;
+  background: #e5e7eb;
 }
 
 .tab.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
+  background: #667eea;
+  color: white;
 }
 
 /* Results section */

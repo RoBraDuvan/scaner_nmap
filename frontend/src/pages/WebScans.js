@@ -96,51 +96,26 @@ function WebScans() {
 
       {error && <div className="error-message">{error}</div>}
 
-      <div className="filters-container">
+      <div className="filters">
         <div className="filter-group">
-          <span className="filter-group-label">Status:</span>
-          <div className="filter-buttons">
-            {['all', 'pending', 'running', 'completed', 'failed', 'cancelled'].map(status => (
-              <button
-                key={status}
-                className={`filter-btn ${filterStatus === status ? 'active' : ''}`}
-                data-status={status}
-                onClick={() => setFilterStatus(status)}
-              >
-                {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
-          </div>
+          <label>Tool:</label>
+          <select value={filterTool} onChange={(e) => setFilterTool(e.target.value)}>
+            <option value="all">All Tools</option>
+            <option value="ffuf">ffuf</option>
+            <option value="gowitness">Gowitness</option>
+            <option value="testssl">testssl</option>
+          </select>
         </div>
-        <div className="filter-separator" />
         <div className="filter-group">
-          <span className="filter-group-label">Tool:</span>
-          <div className="filter-buttons">
-            <button
-              className={`filter-btn ${filterTool === 'all' ? 'active' : ''}`}
-              onClick={() => setFilterTool('all')}
-            >
-              All
-            </button>
-            <button
-              className={`filter-btn ${filterTool === 'ffuf' ? 'active' : ''}`}
-              onClick={() => setFilterTool('ffuf')}
-            >
-              🔍 ffuf
-            </button>
-            <button
-              className={`filter-btn ${filterTool === 'gowitness' ? 'active' : ''}`}
-              onClick={() => setFilterTool('gowitness')}
-            >
-              📸 gowitness
-            </button>
-            <button
-              className={`filter-btn ${filterTool === 'testssl' ? 'active' : ''}`}
-              onClick={() => setFilterTool('testssl')}
-            >
-              🔒 testssl
-            </button>
-          </div>
+          <label>Status:</label>
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="running">Running</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
         </div>
       </div>
 

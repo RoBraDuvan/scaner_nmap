@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import api from '../services/api';
 import './WebScanDetails.css';
@@ -92,17 +92,27 @@ function WebScanDetails() {
     return <div className="error-message">Scan not found</div>;
   }
 
+  const getToolLabel = (tool) => {
+    switch (tool) {
+      case 'ffuf': return 'FFUF';
+      case 'gowitness': return 'GoWitness';
+      case 'testssl': return 'TestSSL';
+      default: return tool;
+    }
+  };
+
   return (
     <div className="webscan-details">
-      <div className="details-header">
+      <div className="page-header">
         <div className="header-left">
-          <button className="btn btn-secondary btn-back" onClick={() => navigate('/webscans')}>
-            ← Back
-          </button>
-          <div className="header-title">
-            <h1>{scan.name}</h1>
-            <span className={`tool-badge ${getToolBadgeClass(scan.tool)}`}>{scan.tool}</span>
+          <Link to="/webscans" className="back-link">← Back to Web Scans</Link>
+          <h1>{scan.name}</h1>
+          <div className="scan-meta">
+            <span className={`type-badge ${getToolBadgeClass(scan.tool)}`}>
+              {getToolLabel(scan.tool)}
+            </span>
             <span className={`status-badge status-${scan.status}`}>{scan.status}</span>
+            <span className="target">{scan.target}</span>
           </div>
         </div>
         <div className="header-actions">
@@ -111,78 +121,59 @@ function WebScanDetails() {
               Cancel Scan
             </button>
           )}
-          <button className="btn btn-danger" onClick={deleteScan}>
-            Delete
-          </button>
+          {(scan.status === 'completed' || scan.status === 'failed' || scan.status === 'cancelled') && (
+            <button className="btn btn-danger" onClick={deleteScan}>
+              Delete
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="scan-meta card">
-        <div className="meta-grid">
-          <div className="meta-item">
-            <span className="meta-label">Target</span>
-            <span className="meta-value">{scan.target}</span>
+      {/* Progress */}
+      {(scan.status === 'running' || scan.status === 'pending') && (
+        <div className="progress-section card">
+          <div className="progress-bar-large">
+            <div className="progress-fill" style={{ width: `${scan.progress}%` }}></div>
+            <span className="progress-text">{scan.progress}%</span>
           </div>
-          <div className="meta-item">
-            <span className="meta-label">Tool</span>
-            <span className="meta-value">{scan.tool}</span>
-          </div>
-          <div className="meta-item">
-            <span className="meta-label">Created</span>
-            <span className="meta-value">
-              {format(new Date(scan.created_at), 'MMM dd, yyyy HH:mm:ss')}
-            </span>
-          </div>
-          <div className="meta-item">
-            <span className="meta-label">Progress</span>
-            <span className="meta-value">{scan.progress}%</span>
-          </div>
+          <p className="progress-status">
+            {scan.status === 'pending' ? 'Waiting to start...' : 'Scanning in progress...'}
+          </p>
         </div>
+      )}
 
-        {scan.status === 'running' && (
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${scan.progress}%` }} />
-          </div>
-        )}
-
-        {scan.error_message && (
-          <div className="error-message">{scan.error_message}</div>
-        )}
-      </div>
-
-      {/* Stats Section */}
-      {stats && (
-        <div className="stats-section card">
-          <h3>Statistics</h3>
-          <div className="stats-grid">
-            <div className="stat-item">
-              <span className="stat-value">{stats.total}</span>
-              <span className="stat-label">Total Results</span>
+      {/* Stats Summary */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">{stats?.total || 0}</div>
+          <div className="stat-label">Total Results</div>
+        </div>
+        {scan.tool === 'ffuf' && stats?.by_status_code && (
+          Object.entries(stats.by_status_code).slice(0, 3).map(([code, count]) => (
+            <div key={code} className="stat-card">
+              <div className="stat-value">{count}</div>
+              <div className="stat-label">HTTP {code}</div>
             </div>
-            {scan.tool === 'ffuf' && stats.by_status_code && (
-              Object.entries(stats.by_status_code).map(([code, count]) => (
-                <div key={code} className="stat-item">
-                  <span className="stat-value">{count}</span>
-                  <span className="stat-label">HTTP {code}</span>
-                </div>
-              ))
-            )}
-            {scan.tool === 'gowitness' && stats.screenshots && (
-              <div className="stat-item">
-                <span className="stat-value">{stats.screenshots}</span>
-                <span className="stat-label">Screenshots</span>
-              </div>
-            )}
-            {scan.tool === 'testssl' && stats.by_severity && (
-              Object.entries(stats.by_severity).map(([severity, count]) => (
-                <div key={severity} className={`stat-item ${getSeverityClass(severity)}`}>
-                  <span className="stat-value">{count}</span>
-                  <span className="stat-label">{severity}</span>
-                </div>
-              ))
-            )}
+          ))
+        )}
+        {scan.tool === 'gowitness' && (
+          <div className="stat-card">
+            <div className="stat-value">{stats?.screenshots || 0}</div>
+            <div className="stat-label">Screenshots</div>
           </div>
-        </div>
+        )}
+        {scan.tool === 'testssl' && stats?.by_severity && (
+          Object.entries(stats.by_severity).map(([severity, count]) => (
+            <div key={severity} className={`stat-card ${getSeverityClass(severity)}`}>
+              <div className="stat-value">{count}</div>
+              <div className="stat-label">{severity}</div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {scan.error_message && (
+        <div className="error-message">{scan.error_message}</div>
       )}
 
       <div className="tabs">

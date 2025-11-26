@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import axios from 'axios';
 import './VulnScanDetails.css';
@@ -77,98 +77,66 @@ function VulnScanDetails() {
   }
 
   return (
-    <div className="scan-details">
-      <div className="vuln-details-header">
+    <div className="vuln-scan-details">
+      <div className="page-header">
         <div className="header-left">
-          <button className="btn btn-secondary btn-back" onClick={() => navigate('/vulnerabilities')}>
-            ← Back
-          </button>
-          <div className="header-title">
-            <h1>{scan.name}</h1>
-            <span className={`badge badge-${scan.status}`}>{scan.status}</span>
+          <Link to="/vulnerabilities" className="back-link">← Back to Vulnerability Scans</Link>
+          <h1>{scan.name}</h1>
+          <div className="scan-meta">
+            <span className="type-badge type-nuclei">Nuclei</span>
+            <span className={`status-badge status-${scan.status}`}>{scan.status}</span>
+            <span className="target">{scan.target}</span>
           </div>
+        </div>
+        <div className="header-actions">
+          {(scan.status === 'pending' || scan.status === 'running') && (
+            <button className="btn btn-warning" onClick={() => {}}>
+              Cancel Scan
+            </button>
+          )}
         </div>
       </div>
 
-      {stats && stats.total > 0 && (
-        <div className="vuln-summary-stats">
-          {stats.by_severity?.critical > 0 && (
-            <div className="vuln-stat critical">
-              <span className="count">{stats.by_severity.critical}</span>
-              <span className="label">Critical</span>
-            </div>
-          )}
-          {stats.by_severity?.high > 0 && (
-            <div className="vuln-stat high">
-              <span className="count">{stats.by_severity.high}</span>
-              <span className="label">High</span>
-            </div>
-          )}
-          {stats.by_severity?.medium > 0 && (
-            <div className="vuln-stat medium">
-              <span className="count">{stats.by_severity.medium}</span>
-              <span className="label">Medium</span>
-            </div>
-          )}
-          {stats.by_severity?.low > 0 && (
-            <div className="vuln-stat low">
-              <span className="count">{stats.by_severity.low}</span>
-              <span className="label">Low</span>
-            </div>
-          )}
-          {stats.by_severity?.info > 0 && (
-            <div className="vuln-stat info">
-              <span className="count">{stats.by_severity.info}</span>
-              <span className="label">Info</span>
-            </div>
-          )}
+      {/* Progress */}
+      {(scan.status === 'running' || scan.status === 'pending') && (
+        <div className="progress-section card">
+          <div className="progress-bar-large">
+            <div className="progress-fill" style={{ width: `${scan.progress}%` }}></div>
+            <span className="progress-text">{scan.progress}%</span>
+          </div>
+          <p className="progress-status">
+            {scan.status === 'pending' ? 'Waiting to start...' : 'Scanning in progress...'}
+          </p>
         </div>
       )}
 
-      <div className="scan-meta card">
-        <div className="vuln-meta-grid">
-          <div className="meta-item">
-            <span className="meta-label">Target</span>
-            <span className="meta-value">{scan.target}</span>
-          </div>
-          <div className="meta-item">
-            <span className="meta-label">Created</span>
-            <span className="meta-value">
-              {format(new Date(scan.created_at), 'MMM dd, yyyy HH:mm:ss')}
-            </span>
-          </div>
-          {scan.started_at && (
-            <div className="meta-item">
-              <span className="meta-label">Started</span>
-              <span className="meta-value">
-                {format(new Date(scan.started_at), 'MMM dd, yyyy HH:mm:ss')}
-              </span>
-            </div>
-          )}
-          {scan.completed_at && (
-            <div className="meta-item">
-              <span className="meta-label">Completed</span>
-              <span className="meta-value">
-                {format(new Date(scan.completed_at), 'MMM dd, yyyy HH:mm:ss')}
-              </span>
-            </div>
-          )}
-          <div className="meta-item">
-            <span className="meta-label">Findings</span>
-            <span className="meta-value">{stats?.total || 0}</span>
-          </div>
+      {/* Stats Summary */}
+      <div className="stats-grid">
+        <div className="stat-card severity-critical">
+          <div className="stat-value">{stats?.by_severity?.critical || 0}</div>
+          <div className="stat-label">Critical</div>
         </div>
-
-        {scan.status === 'running' && (
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${scan.progress}%` }} />
-          </div>
-        )}
-
-        {scan.error_message && (
-          <div className="error-message">{scan.error_message}</div>
-        )}
+        <div className="stat-card severity-high">
+          <div className="stat-value">{stats?.by_severity?.high || 0}</div>
+          <div className="stat-label">High</div>
+        </div>
+        <div className="stat-card severity-medium">
+          <div className="stat-value">{stats?.by_severity?.medium || 0}</div>
+          <div className="stat-label">Medium</div>
+        </div>
+        <div className="stat-card severity-low">
+          <div className="stat-value">{stats?.by_severity?.low || 0}</div>
+          <div className="stat-label">Low</div>
+        </div>
+        <div className="stat-card severity-info">
+          <div className="stat-value">{stats?.by_severity?.info || 0}</div>
+          <div className="stat-label">Info</div>
+        </div>
       </div>
+
+      {scan.error_message && (
+        <div className="error-message">{scan.error_message}</div>
+      )}
 
       <div className="tabs">
         <button

@@ -11,31 +11,33 @@
   margin-bottom: 24px;
 }
 
-.filter-bar {
+.filters {
   display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
 }
 
-.filter-btn {
-  padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  background: white;
-  border-radius: 20px;
-  cursor: pointer;
+.filter-group label {
   font-size: 14px;
-  transition: all 0.2s ease;
+  color: #6b7280;
 }
 
-.filter-btn:hover {
-  background: #f3f4f6;
-}
-
-.filter-btn.active {
-  background: #667eea;
-  border-color: #667eea;
-  color: white;
+.filter-group select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #1f2937;
+  font-size: 14px;
 }
 
 /* Severity tags */

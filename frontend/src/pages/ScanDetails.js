@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import api from '../services/api';
 import './ScanDetails.css';
@@ -97,62 +97,81 @@ function ScanDetails() {
     return <div className="error-message">Scan not found</div>;
   }
 
+  const getScanTypeLabel = (type) => {
+    switch (type) {
+      case 'quick': return 'Quick Scan';
+      case 'full': return 'Full Scan';
+      case 'custom': return 'Custom';
+      default: return type;
+    }
+  };
+
   return (
     <div className="scan-details">
-      <div className="details-header">
+      <div className="page-header">
         <div className="header-left">
-          <button className="btn btn-secondary btn-back" onClick={() => navigate('/network-scans')}>
-            ← Back
-          </button>
-          <div className="header-title">
-            <h1>{scan.name}</h1>
-            <span className={`badge badge-${scan.status}`}>{scan.status}</span>
+          <Link to="/network-scans" className="back-link">← Back to Network Scans</Link>
+          <h1>{scan.name}</h1>
+          <div className="scan-meta">
+            <span className={`type-badge type-${scan.scan_type}`}>
+              {getScanTypeLabel(scan.scan_type)}
+            </span>
+            <span className={`status-badge status-${scan.status}`}>{scan.status}</span>
+            <span className="target">{scan.target}</span>
           </div>
         </div>
         <div className="header-actions">
           {(scan.status === 'pending' || scan.status === 'running') && (
-            <button className="btn btn-danger" onClick={cancelScan} title="Cancel this scan">
+            <button className="btn btn-warning" onClick={cancelScan}>
               Cancel Scan
             </button>
           )}
-          <button className="btn btn-primary" onClick={replicateScan} title="Run a new scan with the same parameters">
+          <button className="btn btn-primary" onClick={replicateScan}>
             Replicate Scan
           </button>
         </div>
       </div>
 
-      <div className="scan-meta card">
-        <div className="meta-grid">
-          <div className="meta-item">
-            <span className="meta-label">Target</span>
-            <span className="meta-value">{scan.target}</span>
+      {/* Progress */}
+      {(scan.status === 'running' || scan.status === 'pending') && (
+        <div className="progress-section card">
+          <div className="progress-bar-large">
+            <div className="progress-fill" style={{ width: `${scan.progress}%` }}></div>
+            <span className="progress-text">{scan.progress}%</span>
           </div>
-          <div className="meta-item">
-            <span className="meta-label">Scan Type</span>
-            <span className="meta-value">{scan.scan_type}</span>
-          </div>
-          <div className="meta-item">
-            <span className="meta-label">Created</span>
-            <span className="meta-value">
-              {format(new Date(scan.created_at), 'MMM dd, yyyy HH:mm:ss')}
-            </span>
-          </div>
-          <div className="meta-item">
-            <span className="meta-label">Progress</span>
-            <span className="meta-value">{scan.progress}%</span>
-          </div>
+          <p className="progress-status">
+            {scan.status === 'pending' ? 'Waiting to start...' : 'Scanning in progress...'}
+          </p>
         </div>
+      )}
 
-        {scan.status === 'running' && (
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${scan.progress}%` }} />
+      {/* Stats Summary */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">{results.length}</div>
+          <div className="stat-label">Hosts Found</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{results.filter(r => r.state === 'up').length}</div>
+          <div className="stat-label">Hosts Up</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">
+            {results.reduce((acc, r) => acc + (r.ports?.length || 0), 0)}
           </div>
-        )}
-
-        {scan.error_message && (
-          <div className="error-message">{scan.error_message}</div>
-        )}
+          <div className="stat-label">Open Ports</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">
+            {results.filter(r => r.os_detection?.matches?.length > 0).length}
+          </div>
+          <div className="stat-label">OS Detected</div>
+        </div>
       </div>
+
+      {scan.error_message && (
+        <div className="error-message">{scan.error_message}</div>
+      )}
 
       <div className="tabs">
         <button

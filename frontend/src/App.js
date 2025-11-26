@@ -12,6 +12,15 @@ import VulnScanDetails from './pages/VulnScanDetails';
 import WebScans from './pages/WebScans';
 import NewWebScan from './pages/NewWebScan';
 import WebScanDetails from './pages/WebScanDetails';
+import ReconScans from './pages/ReconScans';
+import NewReconScan from './pages/NewReconScan';
+import ReconScanDetails from './pages/ReconScanDetails';
+import APIScans from './pages/APIScans';
+import NewAPIScan from './pages/NewAPIScan';
+import APIScanDetails from './pages/APIScanDetails';
+import CMSScans from './pages/CMSScans';
+import NewCMSScan from './pages/NewCMSScan';
+import CMSScanDetails from './pages/CMSScanDetails';
 import './App.css';
 
 function App() {
@@ -32,6 +41,15 @@ function App() {
             <Route path="/webscans" element={<WebScans />} />
             <Route path="/new-webscan" element={<NewWebScan />} />
             <Route path="/webscan/:id" element={<WebScanDetails />} />
+            <Route path="/recon" element={<ReconScans />} />
+            <Route path="/new-recon" element={<NewReconScan />} />
+            <Route path="/recon/:id" element={<ReconScanDetails />} />
+            <Route path="/api-scans" element={<APIScans />} />
+            <Route path="/new-api-scan" element={<NewAPIScan />} />
+            <Route path="/api-scans/:id" element={<APIScanDetails />} />
+            <Route path="/cms-scans" element={<CMSScans />} />
+            <Route path="/new-cms-scan" element={<NewCMSScan />} />
+            <Route path="/cms-scans/:id" element={<CMSScanDetails />} />
           </Routes>
         </main>
       </div>
