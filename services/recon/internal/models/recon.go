@@ -23,13 +23,15 @@ type ReconScan struct {
 
 // SubdomainResult represents a discovered subdomain
 type SubdomainResult struct {
-	ID        uuid.UUID  `json:"id"`
-	ScanID    uuid.UUID  `json:"scan_id"`
-	Subdomain string     `json:"subdomain"`
-	IP        *string    `json:"ip,omitempty"`
-	Source    string     `json:"source"` // subfinder, amass, etc.
-	IsAlive   bool       `json:"is_alive"`
-	CreatedAt time.Time  `json:"created_at"`
+	ID          uuid.UUID  `json:"id"`
+	ScanID      uuid.UUID  `json:"scan_id"`
+	Subdomain   string     `json:"subdomain"`
+	IPAddresses []string   `json:"ip_addresses,omitempty"`
+	Source      string     `json:"source"` // subfinder, amass, etc.
+	IsAlive     bool       `json:"is_alive"`
+	HTTPStatus  *int       `json:"http_status,omitempty"`
+	HTTPSStatus *int       `json:"https_status,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
 }
 
 // WhoisResult represents WHOIS lookup results

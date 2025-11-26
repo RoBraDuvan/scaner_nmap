@@ -1,6 +1,6 @@
 .new-scan h1 {
   font-size: 32px;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 30px;
 }
 
@@ -11,33 +11,35 @@
 .scan-form small {
   display: block;
   margin-top: 6px;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
 .template-info {
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   padding: 20px;
   border-radius: 8px;
   margin-top: 20px;
+  border: 1px solid var(--border-color);
 }
 
 .template-info h3 {
   margin-top: 0;
   margin-bottom: 12px;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .template-info p {
   margin: 8px 0;
-  color: #4b5563;
+  color: var(--text-muted);
 }
 
 .template-info code {
-  background: #e5e7eb;
+  background: var(--border-color);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
+  color: var(--text-primary);
 }
 
 .form-actions {
@@ -49,7 +51,7 @@
 
 .scan-types-info h2 {
   font-size: 24px;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 20px;
 }
 
@@ -60,31 +62,39 @@
 }
 
 .scan-type-card {
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   padding: 16px;
   border-radius: 8px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scan-type-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-md);
 }
 
 .scan-type-card h3 {
   margin: 0 0 8px 0;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 
 .scan-type-card p {
   margin: 0 0 12px 0;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
 .scan-type-card code {
-  background: #e5e7eb;
+  background: var(--border-color);
   padding: 6px 10px;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
   font-size: 13px;
   display: block;
+  color: var(--text-primary);
 }
 
 /* Scanner tabs */
@@ -96,23 +106,24 @@
 
 .scanner-tab {
   padding: 10px 20px;
-  border: 2px solid #e5e7eb;
-  background: #f9fafb;
+  border: 2px solid var(--border-color);
+  background: var(--bg-tertiary);
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
+  color: var(--text-primary);
 }
 
 .scanner-tab:hover {
-  border-color: #667eea;
-  background: #f3f4f6;
+  border-color: var(--accent-primary);
+  background: var(--bg-secondary);
 }
 
 .scanner-tab.active {
-  border-color: #667eea;
-  background: #667eea;
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
   color: white;
 }
 
@@ -126,21 +137,22 @@
 
 .scanner-filter button {
   padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  background: white;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
   border-radius: 20px;
   cursor: pointer;
   font-size: 13px;
   transition: all 0.2s ease;
+  color: var(--text-primary);
 }
 
 .scanner-filter button:hover {
-  background: #f3f4f6;
+  background: var(--bg-tertiary);
 }
 
 .scanner-filter button.active {
-  background: #667eea;
-  border-color: #667eea;
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   color: white;
 }
 
@@ -148,28 +160,18 @@
 .scanner-badge {
   display: inline-block;
   padding: 4px 8px;
-  background: #e5e7eb;
+  background: var(--border-color);
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   margin-bottom: 8px;
-  color: #4b5563;
+  color: var(--text-muted);
 }
 
 /* Selected scan type card */
 .scan-type-card.selected {
-  background: #eef2ff;
-  border-color: #667eea;
+  background: var(--filter-bg);
+  border-color: var(--accent-primary);
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-}
-
-.scan-type-card {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.scan-type-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

@@ -18,10 +18,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #374151;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -30,15 +30,15 @@
 }
 
 .back-link:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
-  color: #1f2937;
+  background: var(--border-color);
+  border-color: var(--border-light);
+  color: var(--text-primary);
 }
 
 .page-header h1 {
   margin: 0 0 12px 0;
   font-size: 28px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .scan-meta {
@@ -49,7 +49,7 @@
 }
 
 .target {
-  color: #6b7280;
+  color: var(--text-muted);
   font-family: 'Courier New', monospace;
   font-size: 14px;
 }
@@ -98,7 +98,7 @@
 .progress-bar-large {
   position: relative;
   height: 30px;
-  background: #e5e7eb;
+  background: var(--bg-tertiary);
   border-radius: 15px;
   overflow: hidden;
   margin-bottom: 12px;
@@ -116,11 +116,11 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .progress-status {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -133,22 +133,23 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .stat-value {
   font-size: 32px;
   font-weight: 700;
-  color: #667eea;
+  color: var(--accent-primary);
 }
 
 .stat-label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
@@ -170,20 +171,20 @@
 .tab {
   padding: 10px 20px;
   border: none;
-  background: #f3f4f6;
+  background: var(--bg-tertiary);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
   transition: all 0.2s ease;
 }
 
 .tab:hover {
-  background: #e5e7eb;
+  background: var(--border-color);
 }
 
 .tab.active {
-  background: #667eea;
+  background: var(--accent-primary);
   color: white;
 }
 
@@ -219,15 +220,16 @@
 }
 
 .card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 /* Vulnerability cards */
 .vuln-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   margin-bottom: 16px;
   overflow: hidden;
@@ -238,13 +240,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .vuln-card-header:hover {
-  background: #f3f4f6;
+  background: var(--border-color);
 }
 
 .vuln-card-title {
@@ -256,7 +258,7 @@
 .vuln-card-title h3 {
   margin: 0;
   font-size: 16px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .severity-badge {
@@ -275,7 +277,8 @@
 
 .vuln-card-body {
   padding: 16px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
+  background: var(--card-bg);
 }
 
 .vuln-info-grid {
@@ -293,14 +296,14 @@
 
 .vuln-info-item .label {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .vuln-info-item .value {
   font-size: 14px;
-  color: #1f2937;
+  color: var(--text-primary);
   word-break: break-all;
 }
 
@@ -314,8 +317,8 @@
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 12px;
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .vuln-references {
@@ -324,7 +327,7 @@
 
 .vuln-references h4 {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
@@ -339,7 +342,7 @@
 }
 
 .vuln-references a {
-  color: #667eea;
+  color: var(--accent-primary);
   font-size: 13px;
   text-decoration: none;
 }
@@ -354,7 +357,7 @@
 
 .vuln-curl-command h4 {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
@@ -372,7 +375,7 @@
 
 .expand-icon {
   transition: transform 0.2s;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .expand-icon.expanded {
@@ -388,18 +391,19 @@
 
 .vuln-filter-bar select {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 14px;
-  background: white;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .no-vulns {
   text-align: center;
   padding: 40px;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 16px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   border-radius: 8px;
 }
 
@@ -407,7 +411,7 @@
 .logs-section h2 {
   margin: 0 0 16px 0;
   font-size: 20px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .logs-list {
@@ -421,7 +425,7 @@
   display: flex;
   gap: 12px;
   padding: 8px 12px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .log-entry:last-child {
@@ -429,7 +433,7 @@
 }
 
 .log-time {
-  color: #9ca3af;
+  color: var(--text-light);
   white-space: nowrap;
 }
 
@@ -448,7 +452,7 @@
 .log-error .log-level { background: #fee2e2; color: #991b1b; }
 
 .log-message {
-  color: #374151;
+  color: var(--text-primary);
   word-break: break-word;
 }
 
@@ -456,8 +460,8 @@
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #6b7280;
-  background: #f9fafb;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
   border-radius: 8px;
 }
 
@@ -474,7 +478,7 @@
 .loading {
   text-align: center;
   padding: 60px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 @media (max-width: 768px) {

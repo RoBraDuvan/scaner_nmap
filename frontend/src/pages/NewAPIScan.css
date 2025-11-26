@@ -7,7 +7,7 @@
 .new-api-scan h1 {
   margin: 0 0 24px 0;
   font-size: 28px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .new-api-scan .error-message {
@@ -28,10 +28,10 @@
 
 .scan-type-tab {
   padding: 12px 20px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -39,39 +39,40 @@
 }
 
 .scan-type-tab:hover {
-  background: #f3f4f6;
-  color: #374151;
-  border-color: #d1d5db;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-light);
 }
 
 .scan-type-tab.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: #667eea;
+  border-color: var(--accent-primary);
   color: white;
 }
 
 .scan-form {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .form-header {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .form-header h2 {
   margin: 0 0 8px 0;
   font-size: 20px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .form-header p {
   margin: 0;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -83,7 +84,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -94,10 +95,10 @@
 .new-api-scan .form-group select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  background: white;
-  color: #1f2937;
+  background: var(--input-bg);
+  color: var(--text-primary);
   font-size: 14px;
   transition: border-color 0.2s;
   box-sizing: border-box;
@@ -107,7 +108,7 @@
 .new-api-scan .form-group textarea:focus,
 .new-api-scan .form-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent-primary);
 }
 
 .new-api-scan .form-group textarea {
@@ -119,7 +120,7 @@
 .new-api-scan .form-group small {
   display: block;
   margin-top: 6px;
-  color: #9ca3af;
+  color: var(--text-light);
   font-size: 12px;
 }
 
@@ -141,7 +142,7 @@
   gap: 8px;
   cursor: pointer;
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -151,17 +152,17 @@
 }
 
 .info-box {
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
 }
 
 .info-box h4 {
   margin: 0 0 12px 0;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .info-box ul,
@@ -171,18 +172,18 @@
 }
 
 .info-box li {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 13px;
   margin-bottom: 4px;
 }
 
 .info-box-highlight {
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: var(--filter-bg);
+  border: 1px solid var(--accent-primary);
 }
 
 .info-box-highlight h4 {
-  color: #667eea;
+  color: var(--accent-primary);
 }
 
 .form-actions {
@@ -191,7 +192,7 @@
   gap: 12px;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
 }
 
 .new-api-scan .btn {
@@ -220,14 +221,13 @@
 }
 
 .new-api-scan .btn-secondary {
-  background: #e0e7ff;
-  color: #667eea;
-  border: 1px solid #c7d2fe;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .new-api-scan .btn-secondary:hover {
-  background: #c7d2fe;
-  color: #5b21b6;
+  background: var(--border-color);
 }
 
 @media (max-width: 768px) {

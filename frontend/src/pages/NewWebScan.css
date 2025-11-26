@@ -5,7 +5,7 @@
 
 .new-webscan h1 {
   font-size: 32px;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 24px;
   text-align: center;
 }
@@ -20,8 +20,8 @@
 
 .tool-tab {
   padding: 12px 20px;
-  border: 2px solid #e5e7eb;
-  background: #f9fafb;
+  border: 2px solid var(--border-color);
+  background: var(--bg-tertiary);
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
@@ -29,16 +29,17 @@
   transition: all 0.2s ease;
   min-width: 200px;
   text-align: center;
+  color: var(--text-primary);
 }
 
 .tool-tab:hover {
-  border-color: #667eea;
-  background: #f3f4f6;
+  border-color: var(--accent-primary);
+  background: var(--bg-secondary);
 }
 
 .tool-tab.active {
-  border-color: #667eea;
-  background: #667eea;
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
   color: white;
 }
 
@@ -50,30 +51,31 @@
 .form-header {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .form-header h2 {
   margin: 0 0 8px 0;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .form-header p {
   margin: 0;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .templates-section {
   margin-bottom: 24px;
   padding: 16px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   border-radius: 8px;
+  border: 1px solid var(--border-color);
 }
 
 .templates-section h3 {
   margin: 0 0 12px 0;
   font-size: 14px;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .template-buttons {
@@ -84,17 +86,18 @@
 
 .template-btn {
   padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  background: white;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
   transition: all 0.2s ease;
+  color: var(--text-primary);
 }
 
 .template-btn:hover {
-  border-color: #667eea;
-  background: #eef2ff;
+  border-color: var(--accent-primary);
+  background: var(--filter-bg);
 }
 
 .form-row {
@@ -117,7 +120,7 @@
   display: block;
   margin-bottom: 6px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .form-group input[type="text"],
@@ -126,24 +129,26 @@
 .form-group textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--accent-primary);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .form-group small {
   display: block;
   margin-top: 6px;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 12px;
 }
 
@@ -163,6 +168,7 @@
   gap: 8px;
   cursor: pointer;
   font-weight: normal;
+  color: var(--text-primary);
 }
 
 .checkbox-group input[type="checkbox"] {
@@ -176,8 +182,9 @@
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
   padding: 12px;
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   border-radius: 6px;
+  border: 1px solid var(--border-color);
 }
 
 .checkbox-label {
@@ -186,6 +193,7 @@
   gap: 8px;
   cursor: pointer;
   font-size: 14px;
+  color: var(--text-primary);
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -205,7 +213,7 @@
   justify-content: flex-start;
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
 }
 
 .error-message {

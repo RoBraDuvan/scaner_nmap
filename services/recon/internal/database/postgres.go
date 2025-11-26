@@ -265,16 +265,16 @@ func (d *Database) DeleteScan(id uuid.UUID) error {
 // Subdomain operations
 func (d *Database) SaveSubdomainResult(result *models.SubdomainResult) error {
 	_, err := d.db.Exec(`
-		INSERT INTO subdomain_results (id, scan_id, subdomain, ip, source, is_alive, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
-		ON CONFLICT DO NOTHING
-	`, result.ID, result.ScanID, result.Subdomain, result.IP, result.Source, result.IsAlive, result.CreatedAt)
+		INSERT INTO subdomain_results (id, scan_id, subdomain, ip_addresses, source, is_alive, http_status, https_status, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		ON CONFLICT (scan_id, subdomain) DO NOTHING
+	`, result.ID, result.ScanID, result.Subdomain, pq.Array(result.IPAddresses), result.Source, result.IsAlive, result.HTTPStatus, result.HTTPSStatus, result.CreatedAt)
 	return err
 }
 
 func (d *Database) GetSubdomainResults(scanID uuid.UUID) ([]models.SubdomainResult, error) {
 	rows, err := d.db.Query(`
-		SELECT id, scan_id, subdomain, ip, source, is_alive, created_at
+		SELECT id, scan_id, subdomain, ip_addresses, source, is_alive, http_status, https_status, created_at
 		FROM subdomain_results WHERE scan_id = $1 ORDER BY subdomain
 	`, scanID)
 	if err != nil {
@@ -285,13 +285,18 @@ func (d *Database) GetSubdomainResults(scanID uuid.UUID) ([]models.SubdomainResu
 	var results []models.SubdomainResult
 	for rows.Next() {
 		var r models.SubdomainResult
-		var ip sql.NullString
-		err := rows.Scan(&r.ID, &r.ScanID, &r.Subdomain, &ip, &r.Source, &r.IsAlive, &r.CreatedAt)
+		var httpStatus, httpsStatus sql.NullInt32
+		err := rows.Scan(&r.ID, &r.ScanID, &r.Subdomain, pq.Array(&r.IPAddresses), &r.Source, &r.IsAlive, &httpStatus, &httpsStatus, &r.CreatedAt)
 		if err != nil {
 			continue
 		}
-		if ip.Valid {
-			r.IP = &ip.String
+		if httpStatus.Valid {
+			status := int(httpStatus.Int32)
+			r.HTTPStatus = &status
+		}
+		if httpsStatus.Valid {
+			status := int(httpsStatus.Int32)
+			r.HTTPSStatus = &status
 		}
 		results = append(results, r)
 	}

@@ -74,22 +74,23 @@ func (s *SubdomainScanner) Scan(ctx context.Context, scan *models.ReconScan) err
 	count := 0
 	total := len(subdomains)
 	for subdomain, source := range subdomains {
-		// Resolve IP address
-		var ipAddr *string
+		// Resolve IP addresses
+		var ipAddresses []string
 		ips, err := net.LookupIP(subdomain)
 		if err == nil && len(ips) > 0 {
-			ip := ips[0].String()
-			ipAddr = &ip
+			for _, ip := range ips {
+				ipAddresses = append(ipAddresses, ip.String())
+			}
 		}
 
 		result := &models.SubdomainResult{
-			ID:        uuid.New(),
-			ScanID:    scan.ID,
-			Subdomain: subdomain,
-			IP:        ipAddr,
-			Source:    source,
-			IsAlive:   ipAddr != nil,
-			CreatedAt: time.Now(),
+			ID:          uuid.New(),
+			ScanID:      scan.ID,
+			Subdomain:   subdomain,
+			IPAddresses: ipAddresses,
+			Source:      source,
+			IsAlive:     len(ipAddresses) > 0,
+			CreatedAt:   time.Now(),
 		}
 		if err := s.db.SaveSubdomainResult(result); err != nil {
 			log.Printf("Error saving subdomain %s: %v", subdomain, err)
