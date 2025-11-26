@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import scans, templates, reports
+from app.api import scans, templates, reports, vulnerability_templates
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -48,6 +48,7 @@ app.add_middleware(
 app.include_router(scans.router, prefix="/api/scans", tags=["Scans"])
 app.include_router(templates.router, prefix="/api/templates", tags=["Templates"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
+app.include_router(vulnerability_templates.router, prefix="/api/vulnerability-templates", tags=["Vulnerability Templates"])
 
 @app.get("/")
 async def root():

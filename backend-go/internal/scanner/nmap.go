@@ -18,6 +18,7 @@ type Scanner struct {
 	db            *database.Database
 	useSystemNmap bool
 	nmapPath      string
+	cancelFuncs   map[string]context.CancelFunc
 }
 
 func NewScanner(db *database.Database, useSystemNmap bool, nmapPath string) *Scanner {
@@ -25,12 +26,21 @@ func NewScanner(db *database.Database, useSystemNmap bool, nmapPath string) *Sca
 		db:            db,
 		useSystemNmap: useSystemNmap,
 		nmapPath:      nmapPath,
+		cancelFuncs:   make(map[string]context.CancelFunc),
 	}
 }
 
 // ExecuteScan runs an nmap scan and stores results
 func (s *Scanner) ExecuteScan(ctx context.Context, scanID uuid.UUID, target string, arguments string) error {
 	log.Printf("🔍 Starting scan %s on target: %s with args: %s", scanID, target, arguments)
+
+	// Create cancellable context
+	ctx, cancel := context.WithCancel(ctx)
+	s.cancelFuncs[scanID.String()] = cancel
+	defer func() {
+		delete(s.cancelFuncs, scanID.String())
+		cancel()
+	}()
 
 	// Update scan status to running
 	if err := s.updateScanStatus(ctx, scanID, "running", 0, nil); err != nil {
@@ -47,6 +57,12 @@ func (s *Scanner) ExecuteScan(ctx context.Context, scanID uuid.UUID, target stri
 		results, scanErr = s.runSystemNmap(ctx, scanID, target, arguments)
 	} else {
 		results, scanErr = s.runGonmap(ctx, scanID, target, arguments)
+	}
+
+	// Check if context was cancelled
+	if ctx.Err() == context.Canceled {
+		s.addLog(context.Background(), scanID, "info", "Scan was cancelled by user")
+		return nil
 	}
 
 	if scanErr != nil {
@@ -70,6 +86,14 @@ func (s *Scanner) ExecuteScan(ctx context.Context, scanID uuid.UUID, target stri
 	log.Printf("✅ Scan %s completed successfully. Found %d hosts", scanID, len(results))
 
 	return nil
+}
+
+// CancelScan cancels a running scan by its ID
+func (s *Scanner) CancelScan(scanID string) {
+	if cancel, ok := s.cancelFuncs[scanID]; ok {
+		cancel()
+		log.Printf("🛑 Cancelled scan %s", scanID)
+	}
 }
 
 // runGonmap executes scan using gonmap library

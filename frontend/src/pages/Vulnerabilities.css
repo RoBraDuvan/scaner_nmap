@@ -1,0 +1,166 @@
+.vulnerabilities-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.vulnerabilities-header h1 {
+  font-size: 32px;
+  color: #1f2937;
+}
+
+.vuln-scans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 20px;
+}
+
+.vuln-scan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vuln-scan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.vuln-scan-header h3 {
+  font-size: 18px;
+  color: #1f2937;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vuln-scan-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vuln-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #e5e7eb;
+  color: #374151;
+  font-weight: 500;
+}
+
+.tag.severity-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.tag.severity-low {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.tag.severity-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.tag.severity-high {
+  background: #fed7aa;
+  color: #c2410c;
+}
+
+.tag.severity-critical {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.vuln-stats {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.stat-badge.critical {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.stat-badge.high {
+  background: #fed7aa;
+  color: #c2410c;
+}
+
+.stat-badge.medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.stat-badge.low {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.stat-badge.info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.vuln-scan-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.vuln-scan-actions .btn {
+  flex: 1;
+  text-align: center;
+}
+
+/* Badge styles */
+.badge-pending {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.badge-running {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-failed {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.badge-cancelled {
+  background: #fef3c7;
+  color: #92400e;
+}

@@ -5,10 +5,27 @@
   margin-bottom: 30px;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .details-header h1 {
-  font-size: 32px;
+  font-size: 28px;
   color: #1f2937;
-  margin-bottom: 8px;
+  margin: 0;
+}
+
+.btn-back {
+  padding: 8px 16px;
+  font-size: 14px;
 }
 
 .header-actions {

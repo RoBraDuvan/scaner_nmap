@@ -188,3 +188,63 @@ func (h *ScanHandler) GetScanLogs(c *fiber.Ctx) error {
 
 	return c.JSON(logs)
 }
+
+// DeleteScan deletes a scan and its related data
+func (h *ScanHandler) DeleteScan(c *fiber.Ctx) error {
+	scanID := c.Params("id")
+
+	// Check if scan exists and get its status
+	var status string
+	checkQuery := `SELECT status FROM scans WHERE id = $1`
+	err := h.db.Pool.QueryRow(context.Background(), checkQuery, scanID).Scan(&status)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Scan not found"})
+	}
+
+	// If scan is running, cancel it first
+	if status == "running" {
+		h.scanner.CancelScan(scanID)
+	}
+
+	// Delete scan (cascade will delete results and logs)
+	query := `DELETE FROM scans WHERE id = $1`
+	result, err := h.db.Pool.Exec(context.Background(), query, scanID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete scan"})
+	}
+
+	if result.RowsAffected() == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "Scan not found"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Scan deleted successfully"})
+}
+
+// CancelScan cancels a running scan
+func (h *ScanHandler) CancelScan(c *fiber.Ctx) error {
+	scanID := c.Params("id")
+
+	// Check if scan exists and is running
+	var status string
+	checkQuery := `SELECT status FROM scans WHERE id = $1`
+	err := h.db.Pool.QueryRow(context.Background(), checkQuery, scanID).Scan(&status)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Scan not found"})
+	}
+
+	if status != "running" && status != "pending" {
+		return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("Cannot cancel scan with status: %s", status)})
+	}
+
+	// Cancel the scan
+	h.scanner.CancelScan(scanID)
+
+	// Update status to cancelled
+	updateQuery := `UPDATE scans SET status = 'cancelled', completed_at = NOW() WHERE id = $1`
+	_, err = h.db.Pool.Exec(context.Background(), updateQuery, scanID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update scan status"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Scan cancelled successfully"})
+}

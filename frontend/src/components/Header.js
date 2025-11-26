@@ -9,8 +9,8 @@ function Header() {
     <header className="header">
       <div className="header-container">
         <Link to="/" className="logo">
-          <span className="logo-icon">🔍</span>
-          <span className="logo-text">Nmap Scanner</span>
+          <span className="logo-icon">🛡️</span>
+          <span className="logo-text">Security Scanner</span>
         </Link>
 
         <nav className="nav">
@@ -21,10 +21,16 @@ function Header() {
             Dashboard
           </Link>
           <Link
-            to="/new-scan"
-            className={`nav-link ${location.pathname === '/new-scan' ? 'active' : ''}`}
+            to="/network-scans"
+            className={`nav-link ${location.pathname === '/network-scans' || location.pathname === '/new-scan' || location.pathname.startsWith('/scan/') ? 'active' : ''}`}
           >
-            New Scan
+            Network Scans
+          </Link>
+          <Link
+            to="/vulnerabilities"
+            className={`nav-link ${location.pathname.startsWith('/vulnerabilities') || location.pathname.startsWith('/vuln-scan') || location.pathname === '/new-vuln-scan' ? 'active' : ''}`}
+          >
+            Vulnerabilities
           </Link>
           <Link
             to="/templates"

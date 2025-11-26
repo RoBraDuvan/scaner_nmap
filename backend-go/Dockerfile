@@ -16,8 +16,20 @@ RUN go mod download && go mod tidy && \
 # Final stage
 FROM alpine:latest
 
-# Install nmap and ca-certificates
-RUN apk --no-cache add ca-certificates nmap
+# Install runtime dependencies
+RUN apk --no-cache add ca-certificates nmap curl unzip
+
+# Install Nuclei
+RUN curl -sSL https://github.com/projectdiscovery/nuclei/releases/download/v3.3.7/nuclei_3.3.7_linux_amd64.zip -o nuclei.zip && \
+    unzip -q nuclei.zip -d /tmp && \
+    mv /tmp/nuclei /usr/local/bin/ && \
+    chmod +x /usr/local/bin/nuclei && \
+    rm -f nuclei.zip
+
+# Create nuclei config directory and download templates
+RUN mkdir -p /root/.config/nuclei /root/nuclei-templates && \
+    nuclei -update-templates 2>&1 || true && \
+    ls -la /root/nuclei-templates/ | head -5 || echo "Templates directory check"
 
 WORKDIR /root/
 

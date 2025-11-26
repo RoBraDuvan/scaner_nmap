@@ -29,12 +29,15 @@ func main() {
 	}
 	defer db.Close()
 
-	// Initialize scanner
+	// Initialize scanners
 	nmapScanner := scanner.NewScanner(db, cfg.UseSystemNmap, cfg.NmapPath)
+	nucleiScanner := scanner.NewNucleiScanner(db)
 
 	// Initialize handlers
 	scanHandler := handlers.NewScanHandler(db, nmapScanner)
 	templateHandler := handlers.NewTemplateHandler(db)
+	vulnHandler := handlers.NewVulnerabilityHandler(db, nucleiScanner)
+	reportHandler := handlers.NewReportHandler(db)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -56,14 +59,37 @@ func main() {
 	scans.Get("/:id", scanHandler.GetScan)
 	scans.Get("/:id/results", scanHandler.GetScanResults)
 	scans.Get("/:id/logs", scanHandler.GetScanLogs)
+	scans.Delete("/:id", scanHandler.DeleteScan)
+	scans.Post("/:id/cancel", scanHandler.CancelScan)
 
 	// Template routes
 	templates := api.Group("/templates")
 	templates.Get("/", templateHandler.ListTemplates)
+	templates.Get("/builtin", templateHandler.ListBuiltinTemplates)
 	templates.Post("/", templateHandler.CreateTemplate)
 	templates.Get("/:id", templateHandler.GetTemplate)
 	templates.Put("/:id", templateHandler.UpdateTemplate)
 	templates.Delete("/:id", templateHandler.DeleteTemplate)
+
+	// Vulnerability templates route
+	api.Get("/vulnerability-templates", templateHandler.ListVulnerabilityTemplates)
+
+	// Report routes
+	reports := api.Group("/reports")
+	reports.Get("/:id/json", reportHandler.GetJSONReport)
+	reports.Get("/:id/html", reportHandler.GetHTMLReport)
+	reports.Get("/:id/csv", reportHandler.GetCSVReport)
+
+	// Vulnerability scan routes
+	vulns := api.Group("/vulnerabilities")
+	vulns.Get("/", vulnHandler.ListVulnScans)
+	vulns.Post("/", vulnHandler.CreateVulnScan)
+	vulns.Get("/:id", vulnHandler.GetVulnScan)
+	vulns.Get("/:id/results", vulnHandler.GetVulnScanResults)
+	vulns.Get("/:id/logs", vulnHandler.GetVulnScanLogs)
+	vulns.Get("/:id/stats", vulnHandler.GetVulnScanStats)
+	vulns.Post("/:id/cancel", vulnHandler.CancelVulnScan)
+	vulns.Delete("/:id", vulnHandler.DeleteVulnScan)
 
 	// Health check
 	app.Get("/health", func(c *fiber.Ctx) error {

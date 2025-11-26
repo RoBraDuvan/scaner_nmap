@@ -88,16 +88,18 @@ function ScanDetails() {
   return (
     <div className="scan-details">
       <div className="details-header">
-        <div>
-          <h1>{scan.name}</h1>
-          <span className={`badge badge-${scan.status}`}>{scan.status}</span>
+        <div className="header-left">
+          <button className="btn btn-secondary btn-back" onClick={() => navigate('/network-scans')}>
+            ← Back
+          </button>
+          <div className="header-title">
+            <h1>{scan.name}</h1>
+            <span className={`badge badge-${scan.status}`}>{scan.status}</span>
+          </div>
         </div>
         <div className="header-actions">
           <button className="btn btn-primary" onClick={replicateScan} title="Run a new scan with the same parameters">
-            🔄 Replicate Scan
-          </button>
-          <button className="btn btn-secondary" onClick={() => navigate('/')}>
-            Back to Dashboard
+            Replicate Scan
           </button>
         </div>
       </div>

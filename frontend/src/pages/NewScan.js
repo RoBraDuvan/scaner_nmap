@@ -140,7 +140,7 @@ function NewScan() {
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/network-scans')}
           >
             Cancel
           </button>

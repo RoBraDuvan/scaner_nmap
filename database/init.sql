@@ -89,3 +89,161 @@ INSERT INTO scan_templates (name, description, scan_type, nmap_arguments, config
 ('Security Audit', 'Complete security audit with SSL/TLS checks', 'security_audit', '-p- -sV --script ssl-cert,ssl-enum-ciphers,ssh-auth-methods -T4', '{"timeout": 3600, "max_hosts": 20}', true),
 ('Stealth Scan', 'SYN stealth scan with minimal footprint', 'stealth', '-sS -T2 -f', '{"timeout": 2400, "max_hosts": 20}', true),
 ('Aggressive Scan', 'Aggressive scan with OS detection, version, scripts and traceroute', 'aggressive', '-A -T4', '{"timeout": 2400, "max_hosts": 20}', true);
+
+-- =====================================================
+-- VULNERABILITY SCANNING TABLES (Nuclei Integration)
+-- =====================================================
+
+-- Vulnerability scans table
+CREATE TABLE IF NOT EXISTS vulnerability_scans (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    target TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    progress INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    error_message TEXT,
+    templates TEXT[],
+    severity TEXT[],
+    tags TEXT[],
+    configuration JSONB,
+    CONSTRAINT valid_vuln_status CHECK (status IN ('pending', 'running', 'completed', 'failed', 'cancelled'))
+);
+
+-- Vulnerability findings table
+CREATE TABLE IF NOT EXISTS vulnerabilities (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES vulnerability_scans(id) ON DELETE CASCADE,
+    template_id VARCHAR(255) NOT NULL,
+    template_name VARCHAR(500) NOT NULL,
+    severity VARCHAR(50) NOT NULL,
+    type VARCHAR(100) NOT NULL,
+    host TEXT NOT NULL,
+    matched_at TEXT,
+    extracted_results TEXT[],
+    curl_command TEXT,
+    request TEXT,
+    response TEXT,
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Vulnerability scan logs table
+CREATE TABLE IF NOT EXISTS vulnerability_scan_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES vulnerability_scans(id) ON DELETE CASCADE,
+    level VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Vulnerability scan templates table (Nuclei presets)
+CREATE TABLE IF NOT EXISTS vulnerability_templates (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    category VARCHAR(100) NOT NULL,
+    nuclei_tags TEXT[],
+    nuclei_templates TEXT[],
+    severity_filter TEXT[],
+    configuration JSONB,
+    is_default BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for vulnerability tables
+CREATE INDEX idx_vuln_scans_status ON vulnerability_scans(status);
+CREATE INDEX idx_vuln_scans_created_at ON vulnerability_scans(created_at DESC);
+CREATE INDEX idx_vulnerabilities_scan_id ON vulnerabilities(scan_id);
+CREATE INDEX idx_vulnerabilities_severity ON vulnerabilities(severity);
+CREATE INDEX idx_vulnerabilities_created_at ON vulnerabilities(created_at DESC);
+CREATE INDEX idx_vuln_scan_logs_scan_id ON vulnerability_scan_logs(scan_id);
+CREATE INDEX idx_vuln_templates_category ON vulnerability_templates(category);
+
+-- Insert default vulnerability scan templates (Nuclei presets)
+INSERT INTO vulnerability_templates (name, description, category, nuclei_tags, nuclei_templates, severity_filter, configuration, is_default) VALUES
+-- Web Application Scans
+('Web Technologies', 'Detect web technologies, frameworks and CMS', 'discovery',
+ ARRAY['tech', 'detect'], NULL, ARRAY['info'],
+ '{"timeout": 300, "rate_limit": 150}', true),
+
+('CVE Detection', 'Scan for known CVE vulnerabilities', 'vulnerability',
+ ARRAY['cve'], NULL, ARRAY['low', 'medium', 'high', 'critical'],
+ '{"timeout": 1800, "rate_limit": 100}', true),
+
+('OWASP Top 10', 'Check for OWASP Top 10 vulnerabilities', 'vulnerability',
+ ARRAY['owasp'], NULL, ARRAY['medium', 'high', 'critical'],
+ '{"timeout": 1800, "rate_limit": 100}', true),
+
+('XSS Detection', 'Cross-Site Scripting vulnerability detection', 'vulnerability',
+ ARRAY['xss'], NULL, ARRAY['low', 'medium', 'high'],
+ '{"timeout": 900, "rate_limit": 50}', true),
+
+('SQL Injection', 'SQL Injection vulnerability detection', 'vulnerability',
+ ARRAY['sqli'], NULL, ARRAY['medium', 'high', 'critical'],
+ '{"timeout": 900, "rate_limit": 50}', true),
+
+('Default Credentials', 'Check for default login credentials', 'misconfiguration',
+ ARRAY['default-login'], NULL, ARRAY['medium', 'high', 'critical'],
+ '{"timeout": 600, "rate_limit": 30}', true),
+
+('Exposed Panels', 'Detect exposed admin panels and dashboards', 'exposure',
+ ARRAY['panel', 'admin'], NULL, ARRAY['info', 'low', 'medium'],
+ '{"timeout": 600, "rate_limit": 100}', true),
+
+('Sensitive Files', 'Find exposed sensitive files and directories', 'exposure',
+ ARRAY['exposure', 'config'], NULL, ARRAY['low', 'medium', 'high'],
+ '{"timeout": 600, "rate_limit": 100}', true),
+
+-- Network Service Scans
+('SSL/TLS Issues', 'Check for SSL/TLS misconfigurations', 'misconfiguration',
+ ARRAY['ssl', 'tls'], NULL, ARRAY['info', 'low', 'medium', 'high'],
+ '{"timeout": 300, "rate_limit": 50}', true),
+
+('Network Services', 'Scan network services for vulnerabilities', 'network',
+ ARRAY['network'], NULL, ARRAY['medium', 'high', 'critical'],
+ '{"timeout": 900, "rate_limit": 50}', true),
+
+-- CMS Specific
+('WordPress Scan', 'WordPress specific vulnerability scan', 'cms',
+ ARRAY['wordpress', 'wp-plugin'], NULL, ARRAY['low', 'medium', 'high', 'critical'],
+ '{"timeout": 1200, "rate_limit": 50}', true),
+
+('Joomla Scan', 'Joomla specific vulnerability scan', 'cms',
+ ARRAY['joomla'], NULL, ARRAY['low', 'medium', 'high', 'critical'],
+ '{"timeout": 900, "rate_limit": 50}', true),
+
+('Drupal Scan', 'Drupal specific vulnerability scan', 'cms',
+ ARRAY['drupal'], NULL, ARRAY['low', 'medium', 'high', 'critical'],
+ '{"timeout": 900, "rate_limit": 50}', true),
+
+-- Cloud & DevOps
+('Cloud Misconfiguration', 'Check for cloud service misconfigurations', 'cloud',
+ ARRAY['cloud', 'aws', 'azure', 'gcp'], NULL, ARRAY['low', 'medium', 'high', 'critical'],
+ '{"timeout": 600, "rate_limit": 50}', true),
+
+('CI/CD Exposure', 'Detect exposed CI/CD configurations', 'devops',
+ ARRAY['cicd', 'git'], NULL, ARRAY['medium', 'high', 'critical'],
+ '{"timeout": 300, "rate_limit": 50}', true),
+
+('API Security', 'API endpoint security checks', 'api',
+ ARRAY['api'], NULL, ARRAY['low', 'medium', 'high', 'critical'],
+ '{"timeout": 900, "rate_limit": 50}', true),
+
+-- Comprehensive Scans
+('Quick Vulnerability Scan', 'Fast scan with common vulnerability checks', 'comprehensive',
+ ARRAY['cve', 'tech'], NULL, ARRAY['medium', 'high', 'critical'],
+ '{"timeout": 600, "rate_limit": 150}', true),
+
+('Full Security Audit', 'Comprehensive security audit with all checks', 'comprehensive',
+ NULL, NULL, ARRAY['info', 'low', 'medium', 'high', 'critical'],
+ '{"timeout": 7200, "rate_limit": 50}', true);
+
+-- Comments
+COMMENT ON TABLE vulnerability_scans IS 'Stores Nuclei vulnerability scan jobs';
+COMMENT ON TABLE vulnerabilities IS 'Stores vulnerability findings from Nuclei';
+COMMENT ON TABLE vulnerability_scan_logs IS 'Stores execution logs for vulnerability scans';
+COMMENT ON TABLE vulnerability_templates IS 'Stores preset configurations for Nuclei scans';
