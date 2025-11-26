@@ -4,16 +4,9 @@ import axios from 'axios';
 import './NewScan.css';
 import './NewVulnScan.css';
 
-const GO_API_URL = process.env.REACT_APP_GO_API_URL || 'http://localhost:8001';
-const PYTHON_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-
-const goApi = axios.create({
-  baseURL: `${GO_API_URL}/api`,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-const pythonApi = axios.create({
-  baseURL: `${PYTHON_API_URL}/api`,
+// Use relative URLs - nginx will proxy /api/ to gateway
+const api = axios.create({
+  baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -38,7 +31,7 @@ function NewVulnScan() {
 
   const loadTemplates = async () => {
     try {
-      const response = await pythonApi.get('/vulnerability-templates/');
+      const response = await api.get('/vulnerability-templates/');
       setTemplates(response.data || []);
     } catch (error) {
       console.error('Error loading vulnerability templates:', error);
@@ -106,7 +99,7 @@ function NewVulnScan() {
         tags: formData.tags.length > 0 ? formData.tags : undefined,
       };
 
-      const response = await goApi.post('/vulnerabilities/', payload);
+      const response = await api.post('/vulnerabilities/', payload);
       navigate(`/vuln-scan/${response.data.id}`);
     } catch (error) {
       setError(error.response?.data?.error || 'Failed to create vulnerability scan');

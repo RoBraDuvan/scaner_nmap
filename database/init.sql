@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS scans (
     name VARCHAR(255) NOT NULL,
     target VARCHAR(500) NOT NULL,
     scan_type VARCHAR(50) NOT NULL,
+    scanner VARCHAR(50) NOT NULL DEFAULT 'nmap',
     status VARCHAR(50) DEFAULT 'pending',
     progress INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -16,7 +17,9 @@ CREATE TABLE IF NOT EXISTS scans (
     completed_at TIMESTAMP,
     error_message TEXT,
     configuration JSONB,
-    CONSTRAINT valid_status CHECK (status IN ('pending', 'running', 'completed', 'failed', 'cancelled'))
+    nmap_arguments VARCHAR(500),
+    CONSTRAINT valid_status CHECK (status IN ('pending', 'running', 'completed', 'failed', 'cancelled')),
+    CONSTRAINT valid_scan_scanner CHECK (scanner IN ('nmap', 'masscan', 'dns'))
 );
 
 -- Scan results table
@@ -42,11 +45,15 @@ CREATE TABLE IF NOT EXISTS scan_templates (
     name VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
     scan_type VARCHAR(50) NOT NULL,
+    scanner VARCHAR(50) NOT NULL DEFAULT 'nmap',
     nmap_arguments VARCHAR(500),
+    ports VARCHAR(500),
+    rate INTEGER,
     configuration JSONB,
     is_default BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT valid_scanner CHECK (scanner IN ('nmap', 'masscan', 'dns'))
 );
 
 -- Scan history/logs table
@@ -60,35 +67,55 @@ CREATE TABLE IF NOT EXISTS scan_logs (
 
 -- Indexes for better performance
 CREATE INDEX idx_scans_status ON scans(status);
+CREATE INDEX idx_scans_scanner ON scans(scanner);
 CREATE INDEX idx_scans_created_at ON scans(created_at DESC);
 CREATE INDEX idx_scan_results_scan_id ON scan_results(scan_id);
 CREATE INDEX idx_scan_results_host ON scan_results(host);
 CREATE INDEX idx_scan_logs_scan_id ON scan_logs(scan_id);
+CREATE INDEX idx_scan_templates_scanner ON scan_templates(scanner);
 
 -- Insert default scan templates
-INSERT INTO scan_templates (name, description, scan_type, nmap_arguments, configuration, is_default) VALUES
+INSERT INTO scan_templates (name, description, scan_type, scanner, nmap_arguments, ports, rate, configuration, is_default) VALUES
+-- =====================================================
+-- NMAP TEMPLATES
+-- =====================================================
 -- Basic Port Scans
-('Quick Scan', 'Fast scan of the most common 100 ports', 'quick', '-F -T4', '{"timeout": 300, "max_hosts": 256}', true),
-('Full Port Scan', 'Comprehensive scan of all 65535 ports', 'full', '-p- -T4', '{"timeout": 3600, "max_hosts": 10}', true),
-('UDP Scan', 'Scan common UDP ports', 'udp', '-sU --top-ports 100 -T4', '{"timeout": 1800, "max_hosts": 50}', true),
+('Quick Scan', 'Fast scan of the most common 100 ports', 'quick', 'nmap', '-F -T4', NULL, NULL, '{"timeout": 300, "max_hosts": 256}', true),
+('Full Port Scan', 'Comprehensive scan of all 65535 ports', 'full', 'nmap', '-p- -T4', NULL, NULL, '{"timeout": 3600, "max_hosts": 10}', true),
+('UDP Scan', 'Scan common UDP ports', 'udp', 'nmap', '-sU --top-ports 100 -T4', NULL, NULL, '{"timeout": 1800, "max_hosts": 50}', true),
 
 -- Network Discovery Scans
-('Host Discovery', 'Discover active hosts in network (ping sweep)', 'discovery', '-sn -PE -PP -PM --dns-servers 8.8.8.8,1.1.1.1 -T4', '{"timeout": 300, "max_hosts": 1024}', true),
-('Local Network Scan', 'Complete local network scan with MAC vendor identification', 'local_network', '-sn -PR --dns-servers 8.8.8.8,1.1.1.1 -T4', '{"timeout": 600, "max_hosts": 256}', true),
+('Host Discovery', 'Discover active hosts in network (ping sweep)', 'discovery', 'nmap', '-sn -PE -PP -PM --dns-servers 8.8.8.8,1.1.1.1 -T4', NULL, NULL, '{"timeout": 300, "max_hosts": 1024}', true),
+('Local Network Scan', 'Complete local network scan with MAC vendor identification', 'local_network', 'nmap', '-sn -PR --dns-servers 8.8.8.8,1.1.1.1 -T4', NULL, NULL, '{"timeout": 600, "max_hosts": 256}', true),
 
 -- Server-Specific Scans
-('Web Server Scan', 'Scan web servers (HTTP/HTTPS) with service detection', 'web_server', '-p 80,443,8080,8443,3000,5000,8000 -sV --script http-title,http-methods,http-headers -T4', '{"timeout": 900, "max_hosts": 50}', true),
-('Database Server Scan', 'Scan common database ports with version detection', 'db_server', '-p 3306,5432,1433,1521,27017,6379,5984,9200,11211 -sV -T4', '{"timeout": 900, "max_hosts": 50}', true),
-('Mail Server Scan', 'Scan mail servers (SMTP, POP3, IMAP)', 'mail_server', '-p 25,110,143,465,587,993,995 -sV --script smtp-commands,pop3-capabilities,imap-capabilities -T4', '{"timeout": 900, "max_hosts": 50}', true),
-('FTP/SSH Server Scan', 'Scan file transfer and remote access services', 'ftp_ssh_server', '-p 20,21,22,23,990,2121,2222 -sV --script ftp-anon,ssh-auth-methods -T4', '{"timeout": 900, "max_hosts": 50}', true),
-('DNS Server Scan', 'Scan DNS servers and detect configuration', 'dns_server', '-p 53 -sU -sV --script dns-nsid,dns-recursion -T4', '{"timeout": 900, "max_hosts": 50}', true),
+('Web Server Scan', 'Scan web servers (HTTP/HTTPS) with service detection', 'web_server', 'nmap', '-p 80,443,8080,8443,3000,5000,8000 -sV --script http-title,http-methods,http-headers -T4', NULL, NULL, '{"timeout": 900, "max_hosts": 50}', true),
+('Database Server Scan', 'Scan common database ports with version detection', 'db_server', 'nmap', '-p 3306,5432,1433,1521,27017,6379,5984,9200,11211 -sV -T4', NULL, NULL, '{"timeout": 900, "max_hosts": 50}', true),
+('Mail Server Scan', 'Scan mail servers (SMTP, POP3, IMAP)', 'mail_server', 'nmap', '-p 25,110,143,465,587,993,995 -sV --script smtp-commands,pop3-capabilities,imap-capabilities -T4', NULL, NULL, '{"timeout": 900, "max_hosts": 50}', true),
+('FTP/SSH Server Scan', 'Scan file transfer and remote access services', 'ftp_ssh_server', 'nmap', '-p 20,21,22,23,990,2121,2222 -sV --script ftp-anon,ssh-auth-methods -T4', NULL, NULL, '{"timeout": 900, "max_hosts": 50}', true),
+('DNS Server Scan (Nmap)', 'Scan DNS servers and detect configuration', 'dns_server', 'nmap', '-p 53 -sU -sV --script dns-nsid,dns-recursion -T4', NULL, NULL, '{"timeout": 900, "max_hosts": 50}', true),
 
 -- Advanced Scans
-('Service Version Detection', 'Detect service versions and OS', 'service', '-sV -O -T4', '{"timeout": 1800, "max_hosts": 50}', true),
-('Vulnerability Scan', 'Scan with NSE vulnerability scripts', 'vulnerability', '-sV --script vuln -T4', '{"timeout": 3600, "max_hosts": 10}', true),
-('Security Audit', 'Complete security audit with SSL/TLS checks', 'security_audit', '-p- -sV --script ssl-cert,ssl-enum-ciphers,ssh-auth-methods -T4', '{"timeout": 3600, "max_hosts": 20}', true),
-('Stealth Scan', 'SYN stealth scan with minimal footprint', 'stealth', '-sS -T2 -f', '{"timeout": 2400, "max_hosts": 20}', true),
-('Aggressive Scan', 'Aggressive scan with OS detection, version, scripts and traceroute', 'aggressive', '-A -T4', '{"timeout": 2400, "max_hosts": 20}', true);
+('Service Version Detection', 'Detect service versions and OS', 'service', 'nmap', '-sV -O -T4', NULL, NULL, '{"timeout": 1800, "max_hosts": 50}', true),
+('Vulnerability Scan', 'Scan with NSE vulnerability scripts', 'vulnerability', 'nmap', '-sV --script vuln -T4', NULL, NULL, '{"timeout": 3600, "max_hosts": 10}', true),
+('Security Audit', 'Complete security audit with SSL/TLS checks', 'security_audit', 'nmap', '-p- -sV --script ssl-cert,ssl-enum-ciphers,ssh-auth-methods -T4', NULL, NULL, '{"timeout": 3600, "max_hosts": 20}', true),
+('Stealth Scan', 'SYN stealth scan with minimal footprint', 'stealth', 'nmap', '-sS -T2 -f', NULL, NULL, '{"timeout": 2400, "max_hosts": 20}', true),
+('Aggressive Scan', 'Aggressive scan with OS detection, version, scripts and traceroute', 'aggressive', 'nmap', '-A -T4', NULL, NULL, '{"timeout": 2400, "max_hosts": 20}', true),
+
+-- =====================================================
+-- MASSCAN TEMPLATES
+-- =====================================================
+('Masscan Quick Scan', 'Fast scan of common ports at high speed', 'masscan_quick', 'masscan', NULL, '21,22,23,25,53,80,110,111,135,139,143,443,445,993,995,1723,3306,3389,5900,8080', 10000, '{"timeout": 300}', true),
+('Masscan Full Port Scan', 'Scan all 65535 ports at high speed', 'masscan_full', 'masscan', NULL, '1-65535', 100000, '{"timeout": 600}', true),
+('Masscan Web Ports', 'Scan common web server ports', 'masscan_web', 'masscan', NULL, '80,443,8080,8443,8000,8888,9000,9090,3000,5000', 10000, '{"timeout": 180}', true),
+('Masscan Database Ports', 'Scan common database ports', 'masscan_database', 'masscan', NULL, '1433,1521,3306,5432,6379,27017,9200,5984', 10000, '{"timeout": 180}', true),
+
+-- =====================================================
+-- DNS SCANNER TEMPLATES
+-- =====================================================
+('DNS Records Scan', 'Query all DNS record types (A, AAAA, MX, NS, TXT)', 'dns_records', 'dns', NULL, NULL, NULL, '{"timeout": 60}', true),
+('Full DNS Scan', 'Complete DNS reconnaissance including subdomain enumeration', 'dns_full', 'dns', NULL, NULL, NULL, '{"timeout": 300, "enumerate_subdomains": true}', true),
+('Subdomain Enumeration', 'Discover subdomains using common wordlist', 'dns_subdomain', 'dns', NULL, NULL, NULL, '{"timeout": 600, "wordlist": "common"}', true);
 
 -- =====================================================
 -- VULNERABILITY SCANNING TABLES (Nuclei Integration)
@@ -247,3 +274,75 @@ COMMENT ON TABLE vulnerability_scans IS 'Stores Nuclei vulnerability scan jobs';
 COMMENT ON TABLE vulnerabilities IS 'Stores vulnerability findings from Nuclei';
 COMMENT ON TABLE vulnerability_scan_logs IS 'Stores execution logs for vulnerability scans';
 COMMENT ON TABLE vulnerability_templates IS 'Stores preset configurations for Nuclei scans';
+
+-- =====================================================
+-- WEB SCANNING TABLES (ffuf, Gowitness, testssl.sh)
+-- =====================================================
+
+-- Web scans table
+CREATE TABLE IF NOT EXISTS web_scans (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    target TEXT NOT NULL,
+    tool VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    progress INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    error_message TEXT,
+    configuration JSONB,
+    CONSTRAINT valid_web_scan_status CHECK (status IN ('pending', 'running', 'completed', 'failed', 'cancelled')),
+    CONSTRAINT valid_web_scan_tool CHECK (tool IN ('ffuf', 'gowitness', 'testssl'))
+);
+
+-- Web scan results table (unified for all web scanning tools)
+CREATE TABLE IF NOT EXISTS web_scan_results (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES web_scans(id) ON DELETE CASCADE,
+    tool VARCHAR(50) NOT NULL,
+    url TEXT,
+    -- ffuf specific fields
+    status_code INTEGER,
+    content_length INTEGER,
+    words INTEGER,
+    lines INTEGER,
+    content_type VARCHAR(255),
+    redirect_url TEXT,
+    -- gowitness specific fields
+    title VARCHAR(500),
+    screenshot_path TEXT,
+    screenshot_b64 TEXT,
+    -- testssl specific fields
+    finding_id VARCHAR(100),
+    severity VARCHAR(50),
+    finding_text TEXT,
+    cve VARCHAR(50),
+    cwe VARCHAR(50),
+    -- common fields
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Web scan logs table
+CREATE TABLE IF NOT EXISTS web_scan_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    scan_id UUID REFERENCES web_scans(id) ON DELETE CASCADE,
+    level VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for web scanning tables
+CREATE INDEX idx_web_scans_status ON web_scans(status);
+CREATE INDEX idx_web_scans_tool ON web_scans(tool);
+CREATE INDEX idx_web_scans_created_at ON web_scans(created_at DESC);
+CREATE INDEX idx_web_scan_results_scan_id ON web_scan_results(scan_id);
+CREATE INDEX idx_web_scan_results_tool ON web_scan_results(tool);
+CREATE INDEX idx_web_scan_results_severity ON web_scan_results(severity);
+CREATE INDEX idx_web_scan_logs_scan_id ON web_scan_logs(scan_id);
+
+-- Comments for web scanning tables
+COMMENT ON TABLE web_scans IS 'Stores web scanning jobs (ffuf, gowitness, testssl.sh)';
+COMMENT ON TABLE web_scan_results IS 'Stores results from web scanning tools';
+COMMENT ON TABLE web_scan_logs IS 'Stores execution logs for web scans';

@@ -34,51 +34,38 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API (Python) - Comentado temporalmente
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: nmap_scanner_backend
-  #   environment:
-  #     DATABASE_URL: ${DATABASE_URL:-postgresql://scanner_user:scanner_pass_2024@database:5432/nmap_scanner}
-  #     REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
-  #     SECRET_KEY: ${SECRET_KEY:-supersecretkey}
-  #     ENVIRONMENT: ${ENVIRONMENT:-development}
-  #   volumes:
-  #     - ./backend:/app
-  #     - scan_results:/app/scan_results
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     database:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - scanner_network
-  #   # Privileged mode needed for Nmap raw packet operations
-  #   privileged: true
-  #   cap_add:
-  #     - NET_ADMIN
-  #     - NET_RAW
-
-  # Backend API (Go) - High Performance
-  backend-go:
+  # API Gateway - Entry point for all services
+  gateway:
     build:
-      context: ./backend-go
+      context: ./services/gateway
       dockerfile: Dockerfile
-    container_name: nmap_scanner_backend_go
+    container_name: scanner_gateway
+    environment:
+      PORT: "8000"
+      NETWORK_SERVICE_URL: http://network-service:8001
+      WEB_SERVICE_URL: http://web-service:8002
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - network-service
+      - web-service
+    networks:
+      - scanner_network
+
+  # Network Service (Nmap) - Port scans and network discovery
+  network-service:
+    build:
+      context: ./services/network
+      dockerfile: Dockerfile
+    container_name: scanner_network_service
     environment:
       PORT: "8001"
       DATABASE_URL: ${DATABASE_URL:-postgresql://scanner_user:scanner_pass_2024@database:5432/nmap_scanner}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       USE_SYSTEM_NMAP: ${USE_SYSTEM_NMAP:-false}
       NMAP_PATH: ${NMAP_PATH:-/usr/bin/nmap}
-      SECRET_KEY: ${SECRET_KEY:-supersecretkey}
       ENVIRONMENT: ${ENVIRONMENT:-development}
-    volumes:
-      - nuclei_templates:/root/nuclei-templates
     ports:
       - "8001:8001"
     depends_on:
@@ -94,20 +81,82 @@ services:
       - NET_ADMIN
       - NET_RAW
 
+  # Web Service (Nuclei) - Vulnerability scanning
+  web-service:
+    build:
+      context: ./services/web
+      dockerfile: Dockerfile
+    container_name: scanner_web_service
+    environment:
+      PORT: "8002"
+      DATABASE_URL: ${DATABASE_URL:-postgresql://scanner_user:scanner_pass_2024@database:5432/nmap_scanner}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      NUCLEI_PATH: /usr/local/bin/nuclei
+      NUCLEI_TEMPLATES_PATH: /root/nuclei-templates
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    volumes:
+      - nuclei_templates:/root/nuclei-templates
+    ports:
+      - "8002:8002"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scanner_network
+
+  # Legacy Backend (Go) - DEPRECATED
+  # This service has been replaced by the microservices architecture:
+  # - network-service: Nmap, Masscan, DNS scanning
+  # - web-service: Nuclei, ffuf, Gowitness, testssl.sh
+  # Uncomment if you need backward compatibility
+  #
+  # backend-go:
+  #   build:
+  #     context: ./backend-go
+  #     dockerfile: Dockerfile
+  #   container_name: nmap_scanner_backend_go
+  #   environment:
+  #     PORT: "8001"
+  #     DATABASE_URL: ${DATABASE_URL:-postgresql://scanner_user:scanner_pass_2024@database:5432/nmap_scanner}
+  #     REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+  #     USE_SYSTEM_NMAP: ${USE_SYSTEM_NMAP:-false}
+  #     NMAP_PATH: ${NMAP_PATH:-/usr/bin/nmap}
+  #     SECRET_KEY: ${SECRET_KEY:-supersecretkey}
+  #     ENVIRONMENT: ${ENVIRONMENT:-development}
+  #   volumes:
+  #     - nuclei_templates:/root/nuclei-templates
+  #   ports:
+  #     - "8003:8001"
+  #   depends_on:
+  #     database:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - scanner_network
+  #   privileged: true
+  #   cap_add:
+  #     - NET_ADMIN
+  #     - NET_RAW
+  #   profiles:
+  #     - legacy
+
   # Frontend Web UI
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: http://localhost:8001
+        REACT_APP_API_URL: http://localhost:8000
     container_name: nmap_scanner_frontend
     environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8001}
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8000}
     ports:
       - "3000:80"
     depends_on:
-      - backend-go
+      - gateway
     networks:
       - scanner_network
 

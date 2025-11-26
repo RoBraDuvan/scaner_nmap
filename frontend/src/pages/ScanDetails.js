@@ -77,6 +77,18 @@ function ScanDetails() {
     }
   };
 
+  const cancelScan = async () => {
+    if (!scan) return;
+
+    try {
+      await api.post(`/scans/${id}/cancel`);
+      loadScanData();
+    } catch (error) {
+      console.error('Error cancelling scan:', error);
+      alert('Failed to cancel scan');
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading scan details...</div>;
   }
@@ -98,6 +110,11 @@ function ScanDetails() {
           </div>
         </div>
         <div className="header-actions">
+          {(scan.status === 'pending' || scan.status === 'running') && (
+            <button className="btn btn-danger" onClick={cancelScan} title="Cancel this scan">
+              Cancel Scan
+            </button>
+          )}
           <button className="btn btn-primary" onClick={replicateScan} title="Run a new scan with the same parameters">
             Replicate Scan
           </button>

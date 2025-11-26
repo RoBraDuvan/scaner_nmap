@@ -8,6 +8,7 @@ function Templates() {
   const [showModal, setShowModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [filterScanner, setFilterScanner] = useState('all');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -95,6 +96,20 @@ function Templates() {
     }));
   };
 
+  // Determine scanner type from scan_type
+  const getScannerType = (scanType) => {
+    if (!scanType) return 'nmap';
+    const lower = scanType.toLowerCase();
+    if (lower.startsWith('masscan')) return 'masscan';
+    if (lower.startsWith('dns')) return 'dns';
+    return 'nmap';
+  };
+
+  // Filter templates by scanner
+  const filteredTemplates = filterScanner === 'all'
+    ? templates
+    : templates.filter(t => getScannerType(t.scan_type) === filterScanner);
+
   if (loading) {
     return <div className="loading">Loading templates...</div>;
   }
@@ -115,59 +130,113 @@ function Templates() {
 
       {error && <div className="error-message">{error}</div>}
 
-      <div className="templates-grid">
-        {templates.map(template => (
-          <div key={template.id} className="template-card card">
-            <div className="template-header">
-              <h3>{template.name}</h3>
-              {template.is_default && <span className="badge badge-default">Default</span>}
-            </div>
-
-            <p className="template-description">{template.description}</p>
-
-            <div className="template-details">
-              <div className="detail-row">
-                <span className="detail-label">Type:</span>
-                <span className="detail-value">{template.scan_type}</span>
-              </div>
-
-              <div className="detail-row">
-                <span className="detail-label">Arguments:</span>
-                <code className="detail-value">{template.nmap_arguments}</code>
-              </div>
-
-              {template.configuration && (
-                <div className="detail-row">
-                  <span className="detail-label">Config:</span>
-                  <div className="config-details">
-                    {template.configuration.timeout && (
-                      <span>Timeout: {template.configuration.timeout}s</span>
-                    )}
-                    {template.configuration.max_hosts && (
-                      <span>Max Hosts: {template.configuration.max_hosts}</span>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="template-actions">
-              <button
-                className="btn btn-secondary"
-                onClick={() => handleEdit(template)}
-              >
-                Edit
-              </button>
-              <button
-                className="btn btn-danger"
-                onClick={() => setDeleteConfirm(template)}
-              >
-                Delete
-              </button>
-            </div>
+      <div className="filters-container">
+        <div className="filter-group">
+          <span className="filter-group-label">Scanner:</span>
+          <div className="filter-buttons">
+            <button
+              className={`filter-btn ${filterScanner === 'all' ? 'active' : ''}`}
+              onClick={() => setFilterScanner('all')}
+            >
+              All
+            </button>
+            <button
+              className={`filter-btn ${filterScanner === 'nmap' ? 'active' : ''}`}
+              onClick={() => setFilterScanner('nmap')}
+            >
+              🔍 nmap
+            </button>
+            <button
+              className={`filter-btn ${filterScanner === 'masscan' ? 'active' : ''}`}
+              onClick={() => setFilterScanner('masscan')}
+            >
+              ⚡ masscan
+            </button>
+            <button
+              className={`filter-btn ${filterScanner === 'dns' ? 'active' : ''}`}
+              onClick={() => setFilterScanner('dns')}
+            >
+              🌐 dns
+            </button>
           </div>
-        ))}
+        </div>
       </div>
+
+      {filteredTemplates.length === 0 ? (
+        <div className="card empty-state">
+          <h3>No templates found</h3>
+          <p>Create a new template to get started</p>
+          <button className="btn btn-primary" onClick={handleCreate}>
+            Create your first template
+          </button>
+        </div>
+      ) : (
+        <div className="card templates-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Scanner</th>
+                <th>Scan Type</th>
+                <th>Arguments</th>
+                <th>Default</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTemplates.map(template => {
+                const scannerType = getScannerType(template.scan_type);
+                const scannerIcons = { nmap: '🔍', masscan: '⚡', dns: '🌐' };
+                return (
+                  <tr key={template.id}>
+                    <td>
+                      <span className="template-name">{template.name}</span>
+                    </td>
+                    <td className="description-cell" title={template.description}>
+                      {template.description || '-'}
+                    </td>
+                    <td>
+                      <span className={`scanner-badge scanner-${scannerType}`}>
+                        {scannerIcons[scannerType]} {scannerType}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="type-badge">{template.scan_type}</span>
+                    </td>
+                    <td>
+                      <code className="args-code">{template.nmap_arguments || '-'}</code>
+                    </td>
+                    <td>
+                      {template.is_default ? (
+                        <span className="default-badge">Default</span>
+                      ) : (
+                        <span className="not-default">-</span>
+                      )}
+                    </td>
+                    <td>
+                      <div className="actions-cell">
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => handleEdit(template)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => setDeleteConfirm(template)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Create/Edit Modal */}
       {showModal && (

@@ -4,10 +4,9 @@ import { format } from 'date-fns';
 import axios from 'axios';
 import './Vulnerabilities.css';
 
-const GO_API_URL = process.env.REACT_APP_GO_API_URL || 'http://localhost:8001';
-
+// Use relative URLs - nginx will proxy /api/ to gateway
 const goApi = axios.create({
-  baseURL: `${GO_API_URL}/api`,
+  baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -75,133 +74,157 @@ function Vulnerabilities() {
     }
   };
 
+  const renderSeverityBadges = (scan) => {
+    const stats = scanStats[scan.id];
+    if (!stats || !stats.by_severity) return null;
+
+    const severities = ['critical', 'high', 'medium', 'low', 'info'];
+    const badges = severities
+      .filter(sev => stats.by_severity[sev] > 0)
+      .map(sev => (
+        <span key={sev} className={`severity-badge severity-${sev}`}>
+          {stats.by_severity[sev]}
+        </span>
+      ));
+
+    return badges.length > 0 ? <div className="severity-badges">{badges}</div> : null;
+  };
+
   if (loading) {
     return <div className="loading">Loading vulnerability scans...</div>;
   }
 
   return (
-    <div className="dashboard">
-      <div className="vulnerabilities-header">
+    <div className="vulnerabilities">
+      <div className="page-header">
         <h1>Vulnerability Scans</h1>
         <Link to="/new-vuln-scan" className="btn btn-primary">
           + New Vuln Scan
         </Link>
       </div>
 
-      <div className="filters">
-        {['all', 'pending', 'running', 'completed', 'failed'].map(status => (
-          <button
-            key={status}
-            className={`filter-btn ${filter === status ? 'active' : ''}`}
-            onClick={() => setFilter(status)}
-          >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </button>
-        ))}
+      <div className="filters-container">
+        <div className="filter-group">
+          <span className="filter-group-label">Status:</span>
+          <div className="filter-buttons">
+            {['all', 'pending', 'running', 'completed', 'failed', 'cancelled'].map(status => (
+              <button
+                key={status}
+                className={`filter-btn ${filter === status ? 'active' : ''}`}
+                data-status={status}
+                onClick={() => setFilter(status)}
+              >
+                {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {scans.length === 0 ? (
-        <div className="empty-state">
-          <p>No vulnerability scans found</p>
+        <div className="card empty-state">
+          <h3>No vulnerability scans found</h3>
+          <p>Start scanning for vulnerabilities with Nuclei</p>
           <Link to="/new-vuln-scan" className="btn btn-primary">
             Create your first vulnerability scan
           </Link>
         </div>
       ) : (
-        <div className="vuln-scans-grid">
-          {scans.map(scan => (
-            <div key={scan.id} className="scan-card card vuln-scan-card">
-              <div className="vuln-scan-header">
-                <h3>{scan.name}</h3>
-                <span className={`badge badge-${scan.status}`}>
-                  {scan.status}
-                </span>
-              </div>
-
-              <div className="vuln-scan-info">
-                <div className="info-row">
-                  <span className="label">Target:</span>
-                  <span className="value">{scan.target}</span>
-                </div>
-                <div className="info-row">
-                  <span className="label">Created:</span>
-                  <span className="value">
-                    {format(new Date(scan.created_at), 'MMM dd, yyyy HH:mm')}
-                  </span>
-                </div>
-
-                {scan.severity && scan.severity.length > 0 && (
-                  <div className="vuln-tags">
-                    {scan.severity.map(sev => (
-                      <span key={sev} className={`tag severity-${sev}`}>
-                        {sev}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {scan.tags && scan.tags.length > 0 && (
-                  <div className="vuln-tags">
-                    {scan.tags.map(tag => (
-                      <span key={tag} className="tag">{tag}</span>
-                    ))}
-                  </div>
-                )}
-
-                {scan.status === 'running' && (
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${scan.progress}%` }} />
-                  </div>
-                )}
-
-                {scanStats[scan.id] && scanStats[scan.id].total > 0 && (
-                  <div className="vuln-stats">
-                    {scanStats[scan.id].by_severity?.critical > 0 && (
-                      <span className="stat-badge critical">
-                        {scanStats[scan.id].by_severity.critical} Critical
-                      </span>
+        <div className="card scans-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Target</th>
+                <th>Severity Filter</th>
+                <th>Findings</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scans.map(scan => (
+                <tr key={scan.id}>
+                  <td>
+                    <Link to={`/vuln-scan/${scan.id}`} className="scan-name">
+                      {scan.name}
+                    </Link>
+                  </td>
+                  <td className="target-cell" title={scan.target}>
+                    {scan.target}
+                  </td>
+                  <td>
+                    {scan.severity && scan.severity.length > 0 ? (
+                      <div className="severity-tags">
+                        {scan.severity.map(sev => (
+                          <span key={sev} className={`tag severity-${sev}`}>
+                            {sev}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="tag">all</span>
                     )}
-                    {scanStats[scan.id].by_severity?.high > 0 && (
-                      <span className="stat-badge high">
-                        {scanStats[scan.id].by_severity.high} High
-                      </span>
+                  </td>
+                  <td>
+                    {scan.status === 'completed' && scanStats[scan.id] ? (
+                      renderSeverityBadges(scan) || <span className="no-findings">0</span>
+                    ) : (
+                      <span className="no-findings">-</span>
                     )}
-                    {scanStats[scan.id].by_severity?.medium > 0 && (
-                      <span className="stat-badge medium">
-                        {scanStats[scan.id].by_severity.medium} Medium
-                      </span>
+                  </td>
+                  <td>
+                    <span className={`status-badge status-${scan.status}`}>
+                      {scan.status}
+                    </span>
+                  </td>
+                  <td>
+                    {scan.status === 'running' ? (
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${scan.progress || 0}%` }}
+                        />
+                        <span className="progress-text">{scan.progress || 0}%</span>
+                      </div>
+                    ) : scan.status === 'completed' ? (
+                      <span className="progress-complete">100%</span>
+                    ) : (
+                      <span className="progress-na">-</span>
                     )}
-                    {scanStats[scan.id].by_severity?.low > 0 && (
-                      <span className="stat-badge low">
-                        {scanStats[scan.id].by_severity.low} Low
-                      </span>
-                    )}
-                    {scanStats[scan.id].by_severity?.info > 0 && (
-                      <span className="stat-badge info">
-                        {scanStats[scan.id].by_severity.info} Info
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="vuln-scan-actions">
-                <Link to={`/vuln-scan/${scan.id}`} className="btn btn-secondary">
-                  View Details
-                </Link>
-                {scan.status === 'running' && (
-                  <button className="btn btn-danger" onClick={() => cancelScan(scan.id)}>
-                    Cancel
-                  </button>
-                )}
-                {['completed', 'failed', 'cancelled'].includes(scan.status) && (
-                  <button className="btn btn-danger" onClick={() => deleteScan(scan.id)}>
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td className="date-cell">
+                    {format(new Date(scan.created_at), 'MMM dd, HH:mm')}
+                  </td>
+                  <td>
+                    <div className="actions-cell">
+                      <Link to={`/vuln-scan/${scan.id}`} className="btn btn-secondary btn-sm">
+                        View
+                      </Link>
+                      {scan.status === 'running' && (
+                        <button
+                          className="btn btn-warning btn-sm"
+                          onClick={() => cancelScan(scan.id)}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                      {['completed', 'failed', 'cancelled'].includes(scan.status) && (
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => deleteScan(scan.id)}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

@@ -71,3 +71,6 @@ Thumbs.db
 
 # Others
 .claude/**
+
+# Temporary files and research
+tmp/

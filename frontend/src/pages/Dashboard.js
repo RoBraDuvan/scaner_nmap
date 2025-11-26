@@ -5,10 +5,9 @@ import axios from 'axios';
 import api from '../services/api';
 import './Dashboard.css';
 
-const GO_API_URL = process.env.REACT_APP_GO_API_URL || 'http://localhost:8001';
-
+// Use relative URLs - nginx will proxy /api/ to gateway
 const goApi = axios.create({
-  baseURL: `${GO_API_URL}/api`,
+  baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 

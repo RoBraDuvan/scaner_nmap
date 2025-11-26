@@ -33,6 +33,12 @@ function Header() {
             Vulnerabilities
           </Link>
           <Link
+            to="/webscans"
+            className={`nav-link ${location.pathname === '/webscans' || location.pathname === '/new-webscan' || location.pathname.startsWith('/webscan/') ? 'active' : ''}`}
+          >
+            Web Scans
+          </Link>
+          <Link
             to="/templates"
             className={`nav-link ${location.pathname === '/templates' ? 'active' : ''}`}
           >

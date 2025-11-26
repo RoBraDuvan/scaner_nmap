@@ -1,3 +1,0 @@
-"""
-Nmap Scanner Backend Application
-"""
