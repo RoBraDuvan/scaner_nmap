@@ -299,3 +299,9 @@ func (c *CMSeeKScanner) parseTextOutput(output string, scan *models.CMSScan) (in
 
 	return cmsFound, techsFound
 }
+
+// IsAvailable checks if CMSeeK is available
+func (c *CMSeeKScanner) IsAvailable() bool {
+	_, err := os.Stat(c.cmseekPath)
+	return err == nil
+}

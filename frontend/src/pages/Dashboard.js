@@ -11,6 +11,7 @@ function Dashboard() {
   const [reconScans, setReconScans] = useState([]);
   const [apiScans, setApiScans] = useState([]);
   const [cmsScans, setCmsScans] = useState([]);
+  const [cloudScans, setCloudScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalNetworkScans: 0,
@@ -31,6 +32,9 @@ function Dashboard() {
     totalCmsScans: 0,
     runningCmsScans: 0,
     completedCmsScans: 0,
+    totalCloudScans: 0,
+    runningCloudScans: 0,
+    completedCloudScans: 0,
     totalVulnerabilities: 0,
     criticalVulns: 0,
     highVulns: 0,
@@ -44,13 +48,14 @@ function Dashboard() {
 
   const loadAllData = async () => {
     try {
-      const [networkRes, webRes, vulnRes, reconRes, apiRes, cmsRes] = await Promise.all([
+      const [networkRes, webRes, vulnRes, reconRes, apiRes, cmsRes, cloudRes] = await Promise.all([
         api.get('/scans/'),
         api.get('/webscans/'),
         api.get('/vulnerabilities/'),
         api.get('/recon/'),
         api.get('/apiscans/').catch(() => ({ data: [] })),
-        api.get('/cmsscans/').catch(() => ({ data: [] }))
+        api.get('/cmsscans/').catch(() => ({ data: [] })),
+        api.get('/cloudscans/').catch(() => ({ data: [] }))
       ]);
 
       const networkData = networkRes.data || [];
@@ -59,6 +64,7 @@ function Dashboard() {
       const reconData = reconRes.data || [];
       const apiData = apiRes.data || [];
       const cmsData = cmsRes.data || [];
+      const cloudData = cloudRes.data || [];
 
       setNetworkScans(networkData.slice(0, 5));
       setWebScans(webData.slice(0, 5));
@@ -66,6 +72,7 @@ function Dashboard() {
       setReconScans(reconData.slice(0, 5));
       setApiScans(apiData.slice(0, 5));
       setCmsScans(cmsData.slice(0, 5));
+      setCloudScans(cloudData.slice(0, 5));
 
       // Calculate stats
       const networkRunning = networkData.filter(s => s.status === 'running').length;
@@ -80,6 +87,8 @@ function Dashboard() {
       const apiCompleted = apiData.filter(s => s.status === 'completed').length;
       const cmsRunning = cmsData.filter(s => s.status === 'running').length;
       const cmsCompleted = cmsData.filter(s => s.status === 'completed').length;
+      const cloudRunning = cloudData.filter(s => s.status === 'running').length;
+      const cloudCompleted = cloudData.filter(s => s.status === 'completed').length;
 
       // Load vulnerability stats for completed scans
       let totalVulns = 0;
@@ -119,6 +128,9 @@ function Dashboard() {
         totalCmsScans: cmsData.length,
         runningCmsScans: cmsRunning,
         completedCmsScans: cmsCompleted,
+        totalCloudScans: cloudData.length,
+        runningCloudScans: cloudRunning,
+        completedCloudScans: cloudCompleted,
         totalVulnerabilities: totalVulns,
         criticalVulns,
         highVulns,
@@ -176,6 +188,27 @@ function Dashboard() {
       case 'wpscan': return 'P';
       case 'full': return 'F';
       default: return '?';
+    }
+  };
+
+  const getCloudScanTypeIcon = (scanType) => {
+    switch (scanType) {
+      case 'prowler': return '🔐';
+      case 'scoutsuite': return '🔍';
+      case 'trivy': return '🐳';
+      case 'image': return '📦';
+      case 'full': return '☁️';
+      default: return '☁️';
+    }
+  };
+
+  const getCloudProviderIcon = (provider) => {
+    switch (provider) {
+      case 'aws': return '🟠';
+      case 'azure': return '🔵';
+      case 'gcp': return '🟢';
+      case 'docker': return '🐳';
+      default: return '☁️';
     }
   };
 
@@ -280,6 +313,19 @@ function Dashboard() {
         </div>
 
         <div className="stat-card">
+          <div className="stat-icon cloud-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+            </svg>
+          </div>
+          <div className="stat-content">
+            <span className="stat-value">{stats.totalCloudScans}</span>
+            <span className="stat-label">Cloud Security</span>
+            <span className="stat-detail">{stats.runningCloudScans} running, {stats.completedCloudScans} completed</span>
+          </div>
+        </div>
+
+        <div className="stat-card">
           <div className="stat-icon findings-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
@@ -365,6 +411,16 @@ function Dashboard() {
             </div>
             <span className="action-title">New CMS Scan</span>
             <span className="action-desc">WhatWeb, CMSeeK, WPScan</span>
+          </Link>
+          <Link to="/new-cloud-scan" className="action-card">
+            <div className="action-icon cloud">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+                <path d="M12 12v4M12 16h.01"/>
+              </svg>
+            </div>
+            <span className="action-title">New Cloud Scan</span>
+            <span className="action-desc">Prowler, ScoutSuite, Trivy</span>
           </Link>
         </div>
       </div>
@@ -562,6 +618,40 @@ function Dashboard() {
                       {scan.name}
                     </span>
                     <span className="recent-item-target">{scan.target}</span>
+                  </div>
+                  <div className="recent-item-meta">
+                    <span className={`badge badge-${scan.status}`}>{scan.status}</span>
+                    <span className="recent-item-date">
+                      {format(new Date(scan.created_at), 'MMM dd, HH:mm')}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Cloud Security Scans */}
+        <div className="recent-section">
+          <div className="section-header">
+            <h2>Recent Cloud Scans</h2>
+            <Link to="/cloud-scans" className="view-all-link">View All</Link>
+          </div>
+          {cloudScans.length === 0 ? (
+            <div className="empty-state-small">
+              <p>No cloud scans yet</p>
+              <Link to="/new-cloud-scan" className="btn btn-secondary btn-sm">Create Scan</Link>
+            </div>
+          ) : (
+            <div className="recent-list">
+              {cloudScans.map(scan => (
+                <Link to={`/cloud-scans/${scan.id}`} key={scan.id} className="recent-item">
+                  <div className="recent-item-info">
+                    <span className="recent-item-name">
+                      <span className="item-icon">{getCloudProviderIcon(scan.provider)}</span>
+                      {scan.name}
+                    </span>
+                    <span className="recent-item-target">{scan.scan_type} - {scan.provider}</span>
                   </div>
                   <div className="recent-item-meta">
                     <span className={`badge badge-${scan.status}`}>{scan.status}</span>

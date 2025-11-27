@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -394,4 +395,10 @@ func (w *WhatWebScanner) parseTextOutput(line string, scan *models.CMSScan) (int
 	}
 
 	return techsFound, cmsFound
+}
+
+// IsAvailable checks if WhatWeb is available
+func (w *WhatWebScanner) IsAvailable() bool {
+	_, err := os.Stat(w.whatwebPath)
+	return err == nil
 }

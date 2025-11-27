@@ -12,6 +12,7 @@ type Config struct {
 	ReconServiceURL   string
 	APIServiceURL     string
 	CMSServiceURL     string
+	CloudServiceURL   string
 }
 
 func Load() *Config {
@@ -23,6 +24,7 @@ func Load() *Config {
 		ReconServiceURL:   getEnv("RECON_SERVICE_URL", "http://recon-service:8003"),
 		APIServiceURL:     getEnv("API_SERVICE_URL", "http://api-service:8004"),
 		CMSServiceURL:     getEnv("CMS_SERVICE_URL", "http://cms-service:8005"),
+		CloudServiceURL:   getEnv("CLOUD_SERVICE_URL", "http://cloud-service:8006"),
 	}
 }
 

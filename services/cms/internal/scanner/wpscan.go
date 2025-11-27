@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -401,4 +402,10 @@ func stringOrEmpty(s *string) string {
 		return ""
 	}
 	return *s
+}
+
+// IsAvailable checks if WPScan is available
+func (w *WPScanScanner) IsAvailable() bool {
+	_, err := os.Stat(w.wpscanPath)
+	return err == nil
 }

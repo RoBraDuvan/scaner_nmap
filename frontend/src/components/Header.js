@@ -64,7 +64,10 @@ function Header() {
     location.pathname.startsWith('/api-scans/') ||
     location.pathname === '/cms-scans' ||
     location.pathname === '/new-cms-scan' ||
-    location.pathname.startsWith('/cms-scans/');
+    location.pathname.startsWith('/cms-scans/') ||
+    location.pathname === '/cloud-scans' ||
+    location.pathname === '/new-cloud-scan' ||
+    location.pathname.startsWith('/cloud-scans/');
 
   return (
     <header className="header">
@@ -160,6 +163,23 @@ function Header() {
                 <span className="dropdown-icon">📝</span>
                 CMS Detection
               </Link>
+              <Link
+                to="/cloud-scans"
+                className={`dropdown-item ${location.pathname === '/cloud-scans' || location.pathname === '/new-cloud-scan' || location.pathname.startsWith('/cloud-scans/') ? 'active' : ''}`}
+                onClick={closeMenu}
+              >
+                <span className="dropdown-icon">☁️</span>
+                Cloud Security
+              </Link>
+              <div className="dropdown-divider"></div>
+              <Link
+                to="/cloud-credentials"
+                className={`dropdown-item ${location.pathname === '/cloud-credentials' ? 'active' : ''}`}
+                onClick={closeMenu}
+              >
+                <span className="dropdown-icon">🔑</span>
+                Cloud Credentials
+              </Link>
             </div>
           </div>
 
@@ -214,6 +234,13 @@ function Header() {
               onClick={closeMenu}
             >
               📝 CMS Detection
+            </Link>
+            <Link
+              to="/cloud-scans"
+              className={`nav-link ${location.pathname === '/cloud-scans' || location.pathname === '/new-cloud-scan' || location.pathname.startsWith('/cloud-scans/') ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              ☁️ Cloud Security
             </Link>
           </div>
         </nav>

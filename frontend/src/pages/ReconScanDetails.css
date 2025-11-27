@@ -18,10 +18,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #374151;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -30,15 +30,15 @@
 }
 
 .back-link:hover {
-  background: #e5e7eb;
-  border-color: #d1d5db;
-  color: #1f2937;
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }
 
 .page-header h1 {
   margin: 0 0 12px 0;
   font-size: 28px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .scan-meta {
@@ -49,7 +49,7 @@
 }
 
 .target {
-  color: #6b7280;
+  color: var(--text-muted);
   font-family: 'Courier New', monospace;
   font-size: 14px;
 }
@@ -68,7 +68,7 @@
 .progress-bar-large {
   position: relative;
   height: 30px;
-  background: #e5e7eb;
+  background: var(--bg-tertiary);
   border-radius: 15px;
   overflow: hidden;
   margin-bottom: 12px;
@@ -86,11 +86,11 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .progress-status {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -103,7 +103,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 20px;
   text-align: center;
@@ -118,7 +118,7 @@
 
 .stat-label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
@@ -135,23 +135,23 @@
 }
 
 .type-subdomain {
-  background: #dbeafe;
-  color: #1e40af;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
 }
 
 .type-whois {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
 }
 
 .type-dns {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
 
 .type-tech {
-  background: #e0e7ff;
-  color: #3730a3;
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
 }
 
 /* Status badges */
@@ -165,28 +165,28 @@
 }
 
 .status-pending {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
 }
 
 .status-running {
-  background: #dbeafe;
-  color: #1e40af;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
 }
 
 .status-completed {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
 
 .status-failed {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
 .status-cancelled {
-  background: #e5e7eb;
-  color: #4b5563;
+  background: rgba(107, 114, 128, 0.15);
+  color: #9ca3af;
 }
 
 /* Scan meta card */
@@ -208,14 +208,14 @@
 
 .meta-label {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 600;
 }
 
 .meta-value {
   font-size: 16px;
-  color: #1f2937;
+  color: var(--text-primary);
   word-break: break-all;
 }
 
@@ -230,16 +230,16 @@
 .tab {
   padding: 10px 20px;
   border: none;
-  background: #f3f4f6;
+  background: var(--bg-tertiary);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
   transition: all 0.2s ease;
 }
 
 .tab:hover {
-  background: #e5e7eb;
+  background: var(--bg-secondary);
 }
 
 .tab.active {
@@ -258,7 +258,7 @@
 
 .results-header h3 {
   margin: 0;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 /* Subdomain results */
@@ -275,17 +275,18 @@
 .subdomain-list td {
   padding: 12px 16px;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .subdomain-list th {
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .subdomain-list tbody tr:hover {
-  background: #f9fafb;
+  background: var(--bg-tertiary);
 }
 
 .subdomain-name {
@@ -297,17 +298,17 @@
 .source-badge {
   display: inline-block;
   padding: 2px 8px;
-  background: #e5e7eb;
+  background: var(--bg-tertiary);
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .ip-address {
   font-family: 'Courier New', monospace;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 /* WHOIS results */
@@ -317,7 +318,7 @@
 
 .whois-section {
   padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .whois-section:last-child {
@@ -327,7 +328,7 @@
 .whois-section h3 {
   margin: 0 0 16px 0;
   font-size: 16px;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .info-grid {
@@ -344,14 +345,14 @@
 
 .info-label {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 600;
 }
 
 .info-value {
   font-size: 14px;
-  color: #1f2937;
+  color: var(--text-primary);
   word-break: break-all;
 }
 
@@ -372,7 +373,7 @@
 .ns-list li {
   padding: 4px 0;
   font-family: 'Courier New', monospace;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .status-tags {
@@ -384,10 +385,10 @@
 .status-tag {
   display: inline-block;
   padding: 4px 10px;
-  background: #f3f4f6;
+  background: var(--bg-tertiary);
   border-radius: 4px;
   font-size: 12px;
-  color: #4b5563;
+  color: var(--text-secondary);
   font-family: 'Courier New', monospace;
 }
 
@@ -415,7 +416,7 @@
 .dns-section h3 {
   margin: 0 0 12px 0;
   font-size: 16px;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .dns-table {
@@ -427,20 +428,21 @@
 .dns-table td {
   padding: 10px 16px;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .dns-table th {
-  background: #f9fafb;
+  background: var(--bg-tertiary);
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 12px;
   text-transform: uppercase;
 }
 
 .record-value {
   font-family: 'Courier New', monospace;
-  color: #4b5563;
+  color: var(--text-secondary);
   word-break: break-all;
 }
 
@@ -491,11 +493,11 @@
 .tech-tag {
   display: inline-block;
   padding: 4px 10px;
-  background: #eef2ff;
-  border: 1px solid #c7d2fe;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
   border-radius: 4px;
   font-size: 12px;
-  color: #4338ca;
+  color: #8b5cf6;
 }
 
 .status-code {
@@ -507,23 +509,23 @@
 }
 
 .status-2xx {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
 
 .status-3xx {
-  background: #dbeafe;
-  color: #1e40af;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
 }
 
 .status-4xx {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
 }
 
 .status-5xx {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
 /* Logs section */
@@ -538,7 +540,7 @@
   display: flex;
   gap: 12px;
   padding: 8px 12px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .log-entry:last-child {
@@ -546,7 +548,7 @@
 }
 
 .log-time {
-  color: #9ca3af;
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
@@ -558,20 +560,20 @@
   font-size: 11px;
 }
 
-.log-info .log-level { color: #0284c7; }
-.log-warning .log-level { color: #d97706; }
-.log-error .log-level { color: #dc2626; }
-.log-debug .log-level { color: #6b7280; }
+.log-info .log-level { color: #3b82f6; }
+.log-warning .log-level { color: #f59e0b; }
+.log-error .log-level { color: #ef4444; }
+.log-debug .log-level { color: var(--text-muted); }
 
 .log-message {
-  color: #374151;
+  color: var(--text-primary);
   word-break: break-all;
 }
 
 /* Config section */
 .config-section h3 {
   margin: 0 0 16px 0;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .config-json {
@@ -590,15 +592,15 @@
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #6b7280;
-  background: #f9fafb;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
   border-radius: 8px;
 }
 
 /* Error message */
 .error-message {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
   padding: 12px 16px;
   border-radius: 6px;
   margin-top: 16px;
@@ -608,12 +610,12 @@
 .loading {
   text-align: center;
   padding: 60px;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 /* Card base */
 .card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -640,12 +642,12 @@
 }
 
 .btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
+  background: var(--bg-secondary);
 }
 
 .btn-warning {

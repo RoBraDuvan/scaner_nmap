@@ -34,6 +34,12 @@ type CMSScanConfig struct {
 	WPScanEnumerate     []string `json:"wpscan_enumerate,omitempty"` // vp, ap, u, etc.
 	WPScanDetectionMode string   `json:"wpscan_detection_mode,omitempty"` // mixed, passive, aggressive
 
+	// JoomScan options
+	JoomScanEnumComponents bool `json:"joomscan_enum_components,omitempty"`
+
+	// Droopescan options
+	DroopescanCMS string `json:"droopescan_cms,omitempty"` // drupal, joomla, moodle, silverstripe, auto
+
 	// General options
 	Timeout int               `json:"timeout,omitempty"`
 	Headers map[string]string `json:"headers,omitempty"`

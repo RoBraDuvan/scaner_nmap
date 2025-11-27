@@ -30,6 +30,8 @@ func main() {
 	whatwebPath := getEnv("WHATWEB_PATH", "whatweb")
 	cmseekPath := getEnv("CMSEEK_PATH", "cmseek")
 	wpscanPath := getEnv("WPSCAN_PATH", "wpscan")
+	joomscanPath := getEnv("JOOMSCAN_PATH", "joomscan")
+	droopescanPath := getEnv("DROOPESCAN_PATH", "droopescan")
 
 	// Connect to database
 	db, err := database.New(dbHost, dbPort, dbUser, dbPassword, dbName)
@@ -41,7 +43,7 @@ func main() {
 	log.Println("Connected to database successfully")
 
 	// Create scan manager
-	manager := scanner.NewScanManager(db, whatwebPath, cmseekPath, wpscanPath)
+	manager := scanner.NewScanManager(db, whatwebPath, cmseekPath, wpscanPath, joomscanPath, droopescanPath)
 
 	// Create handlers
 	h := handlers.NewHandler(db, manager)
@@ -77,6 +79,9 @@ func main() {
 			cmsScans.GET("/:id/technologies", h.GetScanTechnologies)
 			cmsScans.GET("/:id/logs", h.GetScanLogs)
 		}
+
+		// Tools info
+		api.GET("/tools", h.GetAvailableTools)
 	}
 
 	// Start server

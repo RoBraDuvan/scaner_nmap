@@ -21,6 +21,10 @@ import APIScanDetails from './pages/APIScanDetails';
 import CMSScans from './pages/CMSScans';
 import NewCMSScan from './pages/NewCMSScan';
 import CMSScanDetails from './pages/CMSScanDetails';
+import CloudScans from './pages/CloudScans';
+import NewCloudScan from './pages/NewCloudScan';
+import CloudScanDetails from './pages/CloudScanDetails';
+import CloudCredentials from './pages/CloudCredentials';
 import './App.css';
 
 function App() {
@@ -50,6 +54,10 @@ function App() {
             <Route path="/cms-scans" element={<CMSScans />} />
             <Route path="/new-cms-scan" element={<NewCMSScan />} />
             <Route path="/cms-scans/:id" element={<CMSScanDetails />} />
+            <Route path="/cloud-scans" element={<CloudScans />} />
+            <Route path="/new-cloud-scan" element={<NewCloudScan />} />
+            <Route path="/cloud-scans/:id" element={<CloudScanDetails />} />
+            <Route path="/cloud-credentials" element={<CloudCredentials />} />
           </Routes>
         </main>
       </div>

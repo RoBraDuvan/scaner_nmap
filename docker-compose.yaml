@@ -47,6 +47,7 @@ services:
       RECON_SERVICE_URL: http://recon-service:8003
       API_SERVICE_URL: http://api-service:8004
       CMS_SERVICE_URL: http://cms-service:8005
+      CLOUD_SERVICE_URL: http://cloud-service:8006
       ENVIRONMENT: ${ENVIRONMENT:-development}
     ports:
       - "8000:8000"
@@ -56,6 +57,7 @@ services:
       - recon-service
       - api-service
       - cms-service
+      - cloud-service
     networks:
       - scanner_network
 
@@ -161,7 +163,7 @@ services:
     networks:
       - scanner_network
 
-  # CMS Detection Service - WhatWeb, CMSeeK, WPScan
+  # CMS Detection Service - WhatWeb, CMSeeK, WPScan, JoomScan, Droopescan
   cms-service:
     build:
       context: ./services/cms
@@ -177,9 +179,49 @@ services:
       WHATWEB_PATH: /usr/local/bin/whatweb
       CMSEEK_PATH: /opt/cmseek/cmseek.py
       WPSCAN_PATH: /usr/local/bin/wpscan
+      JOOMSCAN_PATH: /usr/local/bin/joomscan
+      DROOPESCAN_PATH: /usr/local/bin/droopescan
       ENVIRONMENT: ${ENVIRONMENT:-development}
     ports:
       - "8005:8005"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - scanner_network
+
+  # Cloud Security Service - Trivy, Prowler, ScoutSuite
+  cloud-service:
+    build:
+      context: ./services/cloud
+      dockerfile: Dockerfile
+    container_name: scanner_cloud_service
+    environment:
+      PORT: "8006"
+      DB_HOST: database
+      DB_PORT: "5432"
+      DB_USER: scanner_user
+      DB_PASSWORD: scanner_pass_2024
+      DB_NAME: nmap_scanner
+      TRIVY_PATH: /usr/local/bin/trivy
+      PROWLER_PATH: /usr/local/bin/prowler
+      SCOUTSUITE_PATH: /usr/local/bin/scout
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      # Cloud credentials paths
+      AWS_SHARED_CREDENTIALS_FILE: /root/.aws/credentials
+      AWS_CONFIG_FILE: /root/.aws/config
+      AZURE_CONFIG_DIR: /root/.azure
+      GOOGLE_APPLICATION_CREDENTIALS: /root/.config/gcloud/application_default_credentials.json
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - cloud_credentials:/root/credentials
+      - aws_credentials:/root/.aws
+      - azure_credentials:/root/.azure
+      - gcp_credentials:/root/.config/gcloud
+    ports:
+      - "8006:8006"
     depends_on:
       database:
         condition: service_healthy
@@ -250,3 +292,7 @@ volumes:
   postgres_data:
   scan_results:
   nuclei_templates:
+  cloud_credentials:
+  aws_credentials:
+  azure_credentials:
+  gcp_credentials:

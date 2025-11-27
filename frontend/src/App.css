@@ -77,23 +77,23 @@
 }
 
 .badge-pending {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
 }
 
 .badge-running {
-  background: #dbeafe;
-  color: #1e40af;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
 }
 
 .badge-completed {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
 
 .badge-failed {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
 .loading {
@@ -105,8 +105,8 @@
 }
 
 .error-message {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 20px;

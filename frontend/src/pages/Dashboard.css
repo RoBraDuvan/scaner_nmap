@@ -212,6 +212,11 @@
   color: white;
 }
 
+.stat-icon.cloud-icon {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
+}
+
 .stat-content {
   display: flex;
   flex-direction: column;
@@ -339,6 +344,10 @@
 
 .action-icon.cms {
   background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+.action-icon.cloud {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
 }
 
 .action-icon svg {

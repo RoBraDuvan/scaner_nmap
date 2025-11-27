@@ -1,0 +1,716 @@
+.cloud-scan-details {
+  padding: 20px;
+}
+
+.cloud-scan-details .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.cloud-scan-details .header-left {
+  flex: 1;
+}
+
+.cloud-scan-details .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.cloud-scan-details .back-link:hover {
+  background: var(--border-color);
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.cloud-scan-details h1 {
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  color: var(--text-primary);
+}
+
+.cloud-scan-details .scan-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cloud-scan-details .scan-type {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Provider badges */
+.cloud-scan-details .provider-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.cloud-scan-details .provider-aws {
+  background: rgba(255, 153, 0, 0.15);
+  color: #ff9900;
+}
+
+.cloud-scan-details .provider-azure {
+  background: rgba(0, 120, 212, 0.15);
+  color: #0078d4;
+}
+
+.cloud-scan-details .provider-gcp {
+  background: rgba(66, 133, 244, 0.15);
+  color: #4285f4;
+}
+
+.cloud-scan-details .provider-docker {
+  background: rgba(13, 183, 237, 0.15);
+  color: #0db7ed;
+}
+
+/* Status badges */
+.cloud-scan-details .status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.cloud-scan-details .status-pending { background: rgba(156, 163, 175, 0.15); color: #9ca3af; }
+.cloud-scan-details .status-running { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.cloud-scan-details .status-completed { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+.cloud-scan-details .status-failed { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.cloud-scan-details .status-cancelled { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.cloud-scan-details .status-pass { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+.cloud-scan-details .status-fail { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+/* Progress section */
+.cloud-scan-details .progress-section {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.cloud-scan-details .progress-bar-large {
+  position: relative;
+  height: 30px;
+  background: var(--bg-tertiary);
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.cloud-scan-details .progress-bar-large .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+.cloud-scan-details .progress-bar-large .progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.cloud-scan-details .progress-status {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Stats grid - similar to ScanDetails */
+.cloud-scan-details .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cloud-scan-details .stat-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 1px 3px var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.cloud-scan-details .stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.cloud-scan-details .stat-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Summary section */
+.cloud-scan-details .summary-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cloud-scan-details .summary-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 1px 3px var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.cloud-scan-details .summary-title {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.cloud-scan-details .summary-value {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.cloud-scan-details .summary-card.severity-critical { border-left: 4px solid #dc3545; }
+.cloud-scan-details .summary-card.severity-critical .summary-value { color: #dc3545; }
+
+.cloud-scan-details .summary-card.severity-high { border-left: 4px solid #fd7e14; }
+.cloud-scan-details .summary-card.severity-high .summary-value { color: #fd7e14; }
+
+.cloud-scan-details .summary-card.severity-medium { border-left: 4px solid #ffc107; }
+.cloud-scan-details .summary-card.severity-medium .summary-value { color: #d39e00; }
+
+.cloud-scan-details .summary-card.severity-low { border-left: 4px solid #28a745; }
+.cloud-scan-details .summary-card.severity-low .summary-value { color: #28a745; }
+
+.cloud-scan-details .summary-card.passed { border-left: 4px solid #17a2b8; }
+.cloud-scan-details .summary-card.passed .summary-value { color: #17a2b8; }
+
+/* Tabs */
+.cloud-scan-details .tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.cloud-scan-details .tab {
+  padding: 10px 20px;
+  border: none;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.cloud-scan-details .tab:hover {
+  background: var(--border-color);
+}
+
+.cloud-scan-details .tab.active {
+  background: var(--accent-primary);
+  color: white;
+}
+
+/* Tab content */
+.cloud-scan-details .tab-content {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  min-height: 300px;
+}
+
+.cloud-scan-details .tab-toolbar {
+  margin-bottom: 16px;
+}
+
+.cloud-scan-details .severity-filter {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.cloud-scan-details .empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+}
+
+/* Findings list */
+.cloud-scan-details .findings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cloud-scan-details .finding-item {
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  border-left-width: 4px;
+}
+
+.cloud-scan-details .finding-item.severity-critical {
+  border-left-color: #ff6b6b;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.08) 0%, var(--card-bg) 100%);
+}
+.cloud-scan-details .finding-item.severity-high {
+  border-left-color: #ffa94d;
+  background: linear-gradient(135deg, rgba(255, 169, 77, 0.08) 0%, var(--card-bg) 100%);
+}
+.cloud-scan-details .finding-item.severity-medium {
+  border-left-color: #ffd43b;
+  background: linear-gradient(135deg, rgba(255, 212, 59, 0.06) 0%, var(--card-bg) 100%);
+}
+.cloud-scan-details .finding-item.severity-low {
+  border-left-color: #51cf66;
+  background: linear-gradient(135deg, rgba(81, 207, 102, 0.06) 0%, var(--card-bg) 100%);
+}
+.cloud-scan-details .finding-item.severity-info {
+  border-left-color: #74c0fc;
+  background: linear-gradient(135deg, rgba(116, 192, 252, 0.06) 0%, var(--card-bg) 100%);
+}
+
+.cloud-scan-details .finding-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.cloud-scan-details .severity-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cloud-scan-details .severity-badge.severity-critical {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+.cloud-scan-details .severity-badge.severity-high {
+  background: rgba(255, 169, 77, 0.2);
+  color: #ffa94d;
+  border: 1px solid rgba(255, 169, 77, 0.3);
+}
+.cloud-scan-details .severity-badge.severity-medium {
+  background: rgba(255, 212, 59, 0.2);
+  color: #fcc419;
+  border: 1px solid rgba(255, 212, 59, 0.3);
+}
+.cloud-scan-details .severity-badge.severity-low {
+  background: rgba(81, 207, 102, 0.2);
+  color: #51cf66;
+  border: 1px solid rgba(81, 207, 102, 0.3);
+}
+.cloud-scan-details .severity-badge.severity-info {
+  background: rgba(116, 192, 252, 0.2);
+  color: #74c0fc;
+  border: 1px solid rgba(116, 192, 252, 0.3);
+}
+
+/* Status badge for PASS/FAIL */
+.cloud-scan-details .finding-status-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cloud-scan-details .finding-status-badge.status-fail {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.cloud-scan-details .finding-status-badge.status-pass {
+  background: rgba(81, 207, 102, 0.2);
+  color: #51cf66;
+  border: 1px solid rgba(81, 207, 102, 0.3);
+}
+
+.cloud-scan-details .finding-service,
+.cloud-scan-details .finding-region {
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  background: rgba(116, 192, 252, 0.15);
+  color: #74c0fc;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.cloud-scan-details .finding-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.cloud-scan-details .finding-resource {
+  font-size: 0.85rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  background: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  word-break: break-all;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.cloud-scan-details .finding-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  white-space: pre-line;
+  line-height: 1.6;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  border-left: 3px solid var(--border-color);
+}
+
+.cloud-scan-details .finding-remediation {
+  font-size: 0.9rem;
+  padding: 12px 14px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  color: #4ade80;
+  line-height: 1.5;
+}
+
+.cloud-scan-details .finding-remediation::before {
+  content: "Remediation: ";
+  font-weight: 600;
+  color: #22c55e;
+}
+
+.cloud-scan-details .finding-compliance {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.cloud-scan-details .compliance-tag {
+  padding: 3px 10px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.cloud-scan-details .finding-source {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
+}
+
+/* Vulnerabilities table */
+.cloud-scan-details .vulnerabilities-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cloud-scan-details .vulnerabilities-table th,
+.cloud-scan-details .vulnerabilities-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cloud-scan-details .vulnerabilities-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.cloud-scan-details .cve-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-family: monospace;
+}
+
+.cloud-scan-details .cve-link:hover {
+  text-decoration: underline;
+}
+
+.cloud-scan-details .pkg-name {
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.cloud-scan-details .version {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.cloud-scan-details .vuln-title {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Logs */
+.cloud-scan-details .logs-container {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.cloud-scan-details .logs-list {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.cloud-scan-details .log-entry {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cloud-scan-details .log-entry:last-child {
+  border-bottom: none;
+}
+
+.cloud-scan-details .log-time {
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+.cloud-scan-details .log-level {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.cloud-scan-details .log-info .log-level {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.cloud-scan-details .log-success .log-level {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.cloud-scan-details .log-error .log-level {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.cloud-scan-details .log-warning .log-level {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.cloud-scan-details .log-message {
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+/* Info grid */
+.cloud-scan-details .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.cloud-scan-details .info-item {
+  padding: 12px;
+  background: var(--hover-bg);
+  border-radius: 8px;
+}
+
+.cloud-scan-details .info-item label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.cloud-scan-details .info-item span {
+  font-weight: 500;
+}
+
+.cloud-scan-details .info-item .monospace {
+  font-family: monospace;
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.cloud-scan-details .config-section {
+  margin-top: 24px;
+}
+
+.cloud-scan-details .config-section h3 {
+  margin-bottom: 12px;
+}
+
+.cloud-scan-details .config-section pre {
+  background: var(--hover-bg);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+
+/* Buttons */
+.cloud-scan-details .btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.cloud-scan-details .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.cloud-scan-details .btn-primary:hover {
+  opacity: 0.9;
+}
+
+.cloud-scan-details .btn-warning {
+  background: #f59e0b;
+  color: white;
+}
+
+.cloud-scan-details .btn-warning:hover {
+  background: #d97706;
+}
+
+.cloud-scan-details .btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.cloud-scan-details .btn-danger:hover {
+  background: #dc2626;
+}
+
+.cloud-scan-details .header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Card base */
+.cloud-scan-details .card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+/* Loading */
+.cloud-scan-details .loading {
+  text-align: center;
+  padding: 60px;
+  color: var(--text-muted);
+}
+
+/* Error message */
+.cloud-scan-details .error-message {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cloud-scan-details .page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cloud-scan-details .tabs {
+    flex-direction: column;
+  }
+
+  .cloud-scan-details .tab {
+    width: 100%;
+    text-align: center;
+  }
+
+  .cloud-scan-details .summary-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cloud-scan-details .vulnerabilities-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .cloud-scan-details .header-actions {
+    width: 100%;
+  }
+
+  .cloud-scan-details .header-actions .btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .cloud-scan-details .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

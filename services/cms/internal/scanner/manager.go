@@ -2,6 +2,7 @@ package scanner
 
 import (
 	"context"
+	"strings"
 	"sync"
 
 	"github.com/google/uuid"
@@ -15,17 +16,21 @@ type ScanManager struct {
 	whatweb        *WhatWebScanner
 	cmseek         *CMSeeKScanner
 	wpscan         *WPScanScanner
+	joomscan       *JoomScanScanner
+	droopescan     *DroopescanScanner
 	activeScans    map[uuid.UUID]context.CancelFunc
 	activeScansMux sync.Mutex
 }
 
 // NewScanManager creates a new scan manager
-func NewScanManager(db *database.Database, whatwebPath, cmseekPath, wpscanPath string) *ScanManager {
+func NewScanManager(db *database.Database, whatwebPath, cmseekPath, wpscanPath, joomscanPath, droopescanPath string) *ScanManager {
 	return &ScanManager{
 		db:          db,
 		whatweb:     NewWhatWebScanner(db, whatwebPath),
 		cmseek:      NewCMSeeKScanner(db, cmseekPath),
 		wpscan:      NewWPScanScanner(db, wpscanPath),
+		joomscan:    NewJoomScanScanner(db, joomscanPath),
+		droopescan:  NewDroopescanScanner(db, droopescanPath),
 		activeScans: make(map[uuid.UUID]context.CancelFunc),
 	}
 }
@@ -57,6 +62,20 @@ func (m *ScanManager) runScan(ctx context.Context, scan *models.CMSScan) {
 		err = m.cmseek.Scan(ctx, scan, scan.Config)
 	case "wpscan":
 		err = m.wpscan.Scan(ctx, scan, scan.Config)
+	case "joomscan":
+		err = m.joomscan.Scan(ctx, scan, scan.Config)
+	case "droopescan":
+		err = m.droopescan.Scan(ctx, scan, scan.Config)
+	case "drupal":
+		// Shortcut for Drupal-specific scan
+		if scan.Config == nil {
+			scan.Config = &models.CMSScanConfig{}
+		}
+		scan.Config.DroopescanCMS = "drupal"
+		err = m.droopescan.Scan(ctx, scan, scan.Config)
+	case "joomla":
+		// Use JoomScan for Joomla-specific scans
+		err = m.joomscan.Scan(ctx, scan, scan.Config)
 	case "full":
 		err = m.runFullScan(ctx, scan)
 	default:
@@ -85,10 +104,10 @@ func (m *ScanManager) runScan(ctx context.Context, scan *models.CMSScan) {
 }
 
 func (m *ScanManager) runFullScan(ctx context.Context, scan *models.CMSScan) error {
-	m.db.AddLog(scan.ID, "info", "Starting full CMS scan")
+	m.db.AddLog(scan.ID, "info", "Starting comprehensive CMS scan")
 
-	// Phase 1: WhatWeb for general technology detection (0-30%)
-	m.db.AddLog(scan.ID, "info", "Phase 1: Running WhatWeb...")
+	// Phase 1: WhatWeb for general technology detection (0-20%)
+	m.db.AddLog(scan.ID, "info", "Phase 1: Running WhatWeb for technology detection...")
 	m.db.UpdateScanStatus(scan.ID, "running", 5, nil)
 
 	whatwebErr := m.whatweb.Scan(ctx, scan, scan.Config)
@@ -102,11 +121,11 @@ func (m *ScanManager) runFullScan(ctx context.Context, scan *models.CMSScan) err
 	default:
 	}
 
-	m.db.UpdateScanStatus(scan.ID, "running", 30, nil)
+	m.db.UpdateScanStatus(scan.ID, "running", 20, nil)
 
-	// Phase 2: CMSeeK for CMS-specific detection (30-60%)
-	m.db.AddLog(scan.ID, "info", "Phase 2: Running CMSeeK...")
-	m.db.UpdateScanStatus(scan.ID, "running", 35, nil)
+	// Phase 2: CMSeeK for CMS-specific detection (20-40%)
+	m.db.AddLog(scan.ID, "info", "Phase 2: Running CMSeeK for CMS detection...")
+	m.db.UpdateScanStatus(scan.ID, "running", 25, nil)
 
 	cmseekErr := m.cmseek.Scan(ctx, scan, scan.Config)
 	if cmseekErr != nil {
@@ -119,35 +138,74 @@ func (m *ScanManager) runFullScan(ctx context.Context, scan *models.CMSScan) err
 	default:
 	}
 
-	m.db.UpdateScanStatus(scan.ID, "running", 60, nil)
+	m.db.UpdateScanStatus(scan.ID, "running", 40, nil)
 
-	// Phase 3: WPScan if WordPress detected (60-90%)
-	// Check if WordPress was detected
-	results, _ := m.db.GetCMSResults(scan.ID)
-	isWordPress := false
-	for _, result := range results {
-		if result.CMSName == "WordPress" || result.CMSName == "wordpress" {
-			isWordPress = true
-			break
-		}
+	// Phase 3: Droopescan for Drupal/Moodle/SilverStripe (40-55%)
+	m.db.AddLog(scan.ID, "info", "Phase 3: Running Droopescan for multi-CMS detection...")
+	m.db.UpdateScanStatus(scan.ID, "running", 45, nil)
+
+	droopescanErr := m.droopescan.Scan(ctx, scan, scan.Config)
+	if droopescanErr != nil {
+		m.db.AddLog(scan.ID, "warning", "Droopescan phase completed with issues: "+droopescanErr.Error())
 	}
 
-	if isWordPress {
-		m.db.AddLog(scan.ID, "info", "Phase 3: WordPress detected, running WPScan...")
-		m.db.UpdateScanStatus(scan.ID, "running", 65, nil)
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+
+	m.db.UpdateScanStatus(scan.ID, "running", 55, nil)
+
+	// Get detected CMS to determine which specialized scanners to run
+	results, _ := m.db.GetCMSResults(scan.ID)
+
+	detectedCMS := make(map[string]bool)
+	for _, result := range results {
+		cmsLower := strings.ToLower(result.CMSName)
+		detectedCMS[cmsLower] = true
+	}
+
+	// Phase 4: WordPress-specific scan (55-70%)
+	if detectedCMS["wordpress"] {
+		m.db.AddLog(scan.ID, "info", "Phase 4: WordPress detected, running WPScan...")
+		m.db.UpdateScanStatus(scan.ID, "running", 60, nil)
 
 		wpscanErr := m.wpscan.Scan(ctx, scan, scan.Config)
 		if wpscanErr != nil {
 			m.db.AddLog(scan.ID, "warning", "WPScan phase completed with issues: "+wpscanErr.Error())
 		}
 	} else {
-		m.db.AddLog(scan.ID, "info", "Phase 3: WordPress not detected, skipping WPScan")
+		m.db.AddLog(scan.ID, "info", "Phase 4: WordPress not detected, skipping WPScan")
 	}
 
-	m.db.UpdateScanStatus(scan.ID, "running", 90, nil)
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+
+	m.db.UpdateScanStatus(scan.ID, "running", 70, nil)
+
+	// Phase 5: Joomla-specific scan (70-85%)
+	if detectedCMS["joomla"] {
+		m.db.AddLog(scan.ID, "info", "Phase 5: Joomla detected, running JoomScan...")
+		m.db.UpdateScanStatus(scan.ID, "running", 75, nil)
+
+		joomscanErr := m.joomscan.Scan(ctx, scan, scan.Config)
+		if joomscanErr != nil {
+			m.db.AddLog(scan.ID, "warning", "JoomScan phase completed with issues: "+joomscanErr.Error())
+		}
+	} else {
+		m.db.AddLog(scan.ID, "info", "Phase 5: Joomla not detected, skipping JoomScan")
+	}
+
+	m.db.UpdateScanStatus(scan.ID, "running", 85, nil)
 
 	// Generate summary
 	m.generateSummary(scan.ID)
+
+	m.db.UpdateScanStatus(scan.ID, "running", 95, nil)
 
 	return nil
 }
@@ -170,11 +228,28 @@ func (m *ScanManager) generateSummary(scanID uuid.UUID) {
 		vulnCount += len(wp.Vulnerabilities)
 	}
 
+	// Categorize technologies
+	techCategories := make(map[string]int)
+	for _, tech := range techs {
+		techCategories[tech.Category]++
+	}
+
 	// Log summary
-	m.db.AddLog(scanID, "info", "=== SCAN SUMMARY ===")
-	m.db.AddLog(scanID, "info", "CMS Detected: "+joinKeys(cmsSet))
-	m.db.AddLog(scanID, "info", "Technologies found: "+string(rune(len(techs))))
-	m.db.AddLog(scanID, "info", "Vulnerabilities: "+string(rune(vulnCount)))
+	m.db.AddLog(scanID, "info", "")
+	m.db.AddLog(scanID, "info", "╔════════════════════════════════════════╗")
+	m.db.AddLog(scanID, "info", "║           SCAN SUMMARY                 ║")
+	m.db.AddLog(scanID, "info", "╠════════════════════════════════════════╣")
+	m.db.AddLog(scanID, "info", "║ CMS Detected: "+joinKeys(cmsSet))
+	m.db.AddLog(scanID, "info", "║ Total Technologies: "+string(rune('0'+len(techs))))
+
+	for cat, count := range techCategories {
+		m.db.AddLog(scanID, "info", "║   - "+cat+": "+string(rune('0'+count)))
+	}
+
+	if vulnCount > 0 {
+		m.db.AddLog(scanID, "warning", "║ Vulnerabilities Found: "+string(rune('0'+vulnCount)))
+	}
+	m.db.AddLog(scanID, "info", "╚════════════════════════════════════════╝")
 }
 
 func joinKeys(m map[string]bool) string {
@@ -214,4 +289,15 @@ func (m *ScanManager) IsScanRunning(scanID uuid.UUID) bool {
 
 	_, ok := m.activeScans[scanID]
 	return ok
+}
+
+// GetAvailableTools returns a list of available scanning tools
+func (m *ScanManager) GetAvailableTools() map[string]bool {
+	return map[string]bool{
+		"whatweb":    m.whatweb.IsAvailable(),
+		"cmseek":     m.cmseek.IsAvailable(),
+		"wpscan":     m.wpscan.IsAvailable(),
+		"joomscan":   m.joomscan.IsAvailable(),
+		"droopescan": m.droopescan.IsAvailable(),
+	}
 }

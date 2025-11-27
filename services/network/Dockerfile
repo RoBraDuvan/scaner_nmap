@@ -16,8 +16,8 @@ RUN go mod download && go mod tidy && \
 # Final stage
 FROM alpine:latest
 
-# Install runtime dependencies: Nmap, Masscan, DNS tools, and libpcap for masscan
-RUN apk --no-cache add ca-certificates nmap masscan bind-tools libpcap libpcap-dev
+# Install runtime dependencies: Nmap with scripts, Masscan, DNS tools, and libpcap for masscan
+RUN apk --no-cache add ca-certificates nmap nmap-scripts masscan bind-tools libpcap libpcap-dev
 
 WORKDIR /root/
 

@@ -21,6 +21,7 @@ func main() {
 	log.Printf("Recon Service: %s", cfg.ReconServiceURL)
 	log.Printf("API Service: %s", cfg.APIServiceURL)
 	log.Printf("CMS Service: %s", cfg.CMSServiceURL)
+	log.Printf("Cloud Service: %s", cfg.CloudServiceURL)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -97,9 +98,17 @@ func main() {
 	api.All("/apiscans", serviceProxy.ProxyTo(cfg.APIServiceURL, ""))
 	api.All("/apiscans/*", serviceProxy.ProxyTo(cfg.APIServiceURL, ""))
 
-	// /api/cmsscans -> CMS Service /api/cmsscans (whatweb, cmseek, wpscan)
+	// /api/cmsscans -> CMS Service /api/cmsscans (whatweb, cmseek, wpscan, joomscan, droopescan)
 	api.All("/cmsscans", serviceProxy.ProxyTo(cfg.CMSServiceURL, ""))
 	api.All("/cmsscans/*", serviceProxy.ProxyTo(cfg.CMSServiceURL, ""))
+
+	// /api/cloudscans -> Cloud Service /api/cloudscans (trivy, prowler, scoutsuite)
+	api.All("/cloudscans", serviceProxy.ProxyTo(cfg.CloudServiceURL, ""))
+	api.All("/cloudscans/*", serviceProxy.ProxyTo(cfg.CloudServiceURL, ""))
+
+	// /api/credentials -> Cloud Service /api/credentials (cloud credentials management)
+	api.All("/credentials", serviceProxy.ProxyTo(cfg.CloudServiceURL, ""))
+	api.All("/credentials/*", serviceProxy.ProxyTo(cfg.CloudServiceURL, ""))
 
 	// /api/vulnerability-templates -> Network Service (still has the templates)
 	api.All("/vulnerability-templates", serviceProxy.ProxyTo(cfg.NetworkServiceURL, ""))
@@ -126,6 +135,7 @@ func main() {
 				"recon":   cfg.ReconServiceURL,
 				"api":     cfg.APIServiceURL,
 				"cms":     cfg.CMSServiceURL,
+				"cloud":   cfg.CloudServiceURL,
 			},
 		})
 	})
