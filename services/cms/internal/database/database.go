@@ -19,13 +19,39 @@ func New(host, port, user, password, dbname string) (*Database, error) {
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return nil, err
+	// Retry logic with exponential backoff
+	maxRetries := 10
+	var db *sql.DB
+	var err error
+
+	for i := 0; i < maxRetries; i++ {
+		db, err = sql.Open("postgres", connStr)
+		if err != nil {
+			waitTime := time.Duration(1<<uint(i)) * time.Second
+			if waitTime > 30*time.Second {
+				waitTime = 30 * time.Second
+			}
+			fmt.Printf("Failed to open database (attempt %d/%d): %v. Retrying in %v...\n", i+1, maxRetries, err, waitTime)
+			time.Sleep(waitTime)
+			continue
+		}
+
+		err = db.Ping()
+		if err == nil {
+			break
+		}
+
+		db.Close()
+		waitTime := time.Duration(1<<uint(i)) * time.Second
+		if waitTime > 30*time.Second {
+			waitTime = 30 * time.Second
+		}
+		fmt.Printf("Failed to ping database (attempt %d/%d): %v. Retrying in %v...\n", i+1, maxRetries, err, waitTime)
+		time.Sleep(waitTime)
 	}
 
-	if err := db.Ping(); err != nil {
-		return nil, err
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database after %d attempts: %w", maxRetries, err)
 	}
 
 	database := &Database{db: db}
